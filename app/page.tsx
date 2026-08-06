@@ -256,7 +256,7 @@ export default function Home() {
 
   const getFlyoutTop = (element: HTMLElement, itemCount: number, above: boolean) => {
     const rect = element.getBoundingClientRect();
-    const height = 16 + itemCount * 44;
+    const height = 12 + itemCount * 36;
     return above
       ? Math.max(16, rect.top - height - 8)
       : Math.max(16, Math.min(rect.top - 8, window.innerHeight - height - 16));
