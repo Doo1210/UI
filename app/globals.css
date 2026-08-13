@@ -275,6 +275,14 @@ button { color: inherit; }
   left: 10px;
   width: calc(var(--sidebar-width) - 20px);
 }
+.nav-flyout.is-management-hover::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -10px;
+  left: 0;
+  height: 10px;
+}
 .sidebar.is-collapsed ~ .nav-flyout, .sidebar.is-collapsed ~ * .nav-flyout { left: 82px; }
 .sidebar.is-collapsed ~ .nav-flyout.is-management-hover,
 .sidebar.is-collapsed ~ * .nav-flyout.is-management-hover {

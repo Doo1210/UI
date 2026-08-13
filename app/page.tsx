@@ -79,17 +79,17 @@ const businessNav: NavGroup[] = [
     ],
   },
   {
-    label: "工业引擎",
-    icon: Factory,
-    items: [{ label: "视觉引擎", icon: ScanEye }],
-  },
-  {
-    label: "运行中心",
+    label: "部署运行",
     icon: Activity,
     items: [
       { label: "智能体运行时", icon: Gauge },
       { label: "镜像仓库", icon: Box },
     ],
+  },
+  {
+    label: "工业引擎",
+    icon: Factory,
+    items: [{ label: "视觉引擎", icon: ScanEye }],
   },
 ];
 
@@ -449,8 +449,8 @@ export default function Home() {
           <button className={`nav-item ${selected === "API Key管理" ? "active" : ""}`} onClick={() => selectPage("API Key管理")}>
             <KeyRound size={18} strokeWidth={1.9} /><span className="nav-label">API Key管理</span>
           </button>
-          <button className={`nav-item ${selected === "统计分析" ? "active" : ""}`} onClick={() => selectPage("统计分析")}>
-            <BarChart3 size={18} strokeWidth={1.9} /><span className="nav-label">统计分析</span>
+          <button className={`nav-item ${selected === "统计看板" ? "active" : ""}`} onClick={() => selectPage("统计看板")}>
+            <BarChart3 size={18} strokeWidth={1.9} /><span className="nav-label">统计看板</span>
           </button>
           {role === "system" && (
             <button
@@ -654,7 +654,7 @@ function PlaceholderPage({ selected }: { selected: string }) {
     智能体运行时: { labels: ["运行实例", "健康实例", "可用率", "平均延迟"], values: ["68", "65", "99.6%", "126ms"], panel: "实例运行趋势" },
     镜像仓库: { labels: ["镜像总数", "生产版本", "存储用量", "本周推送"], values: ["126", "34", "286 GB", "18"], panel: "镜像使用趋势" },
     "API Key管理": { labels: ["全部密钥", "正常使用", "即将过期", "今日调用"], values: ["12", "9", "3", "4,286"], panel: "密钥调用趋势" },
-    统计分析: { labels: ["智能体调用", "Token 消耗", "调用成功率", "本月成本"], values: ["18,642", "2.84M", "98.7%", "¥ 8,426"], panel: "用量趋势" },
+    统计看板: { labels: ["智能体调用", "Token 消耗", "调用成功率", "本月成本"], values: ["18,642", "2.84M", "98.7%", "¥ 8,426"], panel: "用量趋势" },
   };
   const profile = profiles[selected] ?? { labels: ["全部项目", "运行中", "健康度", "今日处理"], values: ["24", "18", "96.4%", "128"], panel: `${selected}趋势` };
   const metricIcons = [Database, Activity, Gauge, Check];
