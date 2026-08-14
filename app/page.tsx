@@ -2,17 +2,18 @@
 
 import {
   Activity,
+  BadgeCheck,
   BarChart3,
   Blocks,
   Bot,
   Box,
   BrainCircuit,
-  Building2,
   Check,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   CircleHelp,
+  Cpu,
   Database,
   Eye,
   ExternalLink,
@@ -31,10 +32,12 @@ import {
   Menu,
   MessageSquareText,
   MoreHorizontal,
+  MoreVertical,
   Network,
   PackageOpen,
   Paperclip,
   PanelLeft,
+  PanelsTopLeft,
   Pencil,
   Plus,
   RadioTower,
@@ -43,6 +46,7 @@ import {
   Search,
   Send,
   Settings2,
+  Share2,
   ShieldCheck,
   SlidersHorizontal,
   Sparkles,
@@ -60,7 +64,7 @@ import {
 } from "lucide-react";
 import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 
-type Role = "system" | "org" | "user";
+type Role = "system" | "org" | "operator" | "user";
 type NavItem = { label: string; icon: LucideIcon; badge?: string };
 type NavGroup = {
   label: string;
@@ -70,14 +74,15 @@ type NavGroup = {
 };
 
 const businessNav: NavGroup[] = [
-  { label: "专家", icon: MessageSquareText, badge: "BETA" },
-  { label: "本体智能体", icon: BrainCircuit },
+  { label: "Unibot", icon: Bot },
+  { label: "专家", icon: BadgeCheck, badge: "BETA" },
+  { label: "本体智能体", icon: Share2 },
   { label: "资产广场", icon: Store },
   {
     label: "开发中心",
     icon: Workflow,
     items: [
-      { label: "智能体开发", icon: Bot },
+      { label: "智能体开发", icon: PanelsTopLeft },
       { label: "资源库", icon: LibraryBig },
     ],
   },
@@ -119,7 +124,8 @@ const managementItems: Record<string, NavItem[]> = {
 const roles: { value: Role; label: string; short: string }[] = [
   { value: "system", label: "系统管理员", short: "系" },
   { value: "org", label: "组织管理员", short: "组" },
-  { value: "user", label: "其他用户", short: "用" },
+  { value: "operator", label: "运营人员", short: "运" },
+  { value: "user", label: "普通用户", short: "普" },
 ];
 
 const organizations = ["--- 系统 ---", "测试", "测试 - 测试1", "测试 - 测试1 - 测试11"];
@@ -178,11 +184,11 @@ const agents = [
 type AssetType = "智能体" | "技能" | "插件" | "MCP" | "模型";
 
 const assetTypeNavigation: { label: AssetType; menuLabel: string; icon: LucideIcon }[] = [
-  { label: "智能体", menuLabel: "智能体广场", icon: Bot },
-  { label: "技能", menuLabel: "技能广场", icon: WandSparkles },
-  { label: "插件", menuLabel: "插件广场", icon: Blocks },
-  { label: "MCP", menuLabel: "MCP 广场", icon: RadioTower },
-  { label: "模型", menuLabel: "模型广场", icon: BrainCircuit },
+  { label: "智能体", menuLabel: "智能体", icon: Sparkles },
+  { label: "技能", menuLabel: "技能", icon: WandSparkles },
+  { label: "插件", menuLabel: "插件", icon: Blocks },
+  { label: "MCP", menuLabel: "MCP", icon: RadioTower },
+  { label: "模型", menuLabel: "模型", icon: Cpu },
 ];
 
 const ontologyPrimaryItems: NavItem[] = [
@@ -229,7 +235,7 @@ const assetCatalog: Record<AssetType, typeof agents> = {
 };
 
 export default function Home() {
-  const role: Role = "system";
+  const [role, setRole] = useState<Role>("system");
   const [selected, setSelected] = useState("专家");
   const [assetType, setAssetType] = useState<AssetType>("智能体");
   const [activeSecondary, setActiveSecondary] = useState<"plaza" | "ontology" | null>(null);
@@ -311,6 +317,29 @@ export default function Home() {
   const isManagementSelected = (label: string) =>
     selected === label || managementItems[label]?.some((item) => item.label === selected);
 
+  const canViewPlatformOperations = role === "system" || role === "operator";
+  const canViewManagementCenter = role === "system" || role === "org";
+  const visibleManagementItems = role === "org"
+    ? managementItems.管理中心.filter((item) => item.label === "人员管理")
+    : managementItems.管理中心;
+
+  const switchRole = (nextRole: Role) => {
+    const losesPlatformOperations =
+      nextRole !== "system" && nextRole !== "operator" && isManagementSelected("平台运营");
+    const losesManagementCenter =
+      ((nextRole !== "system" && nextRole !== "org") ||
+        (nextRole === "org" && selected !== "人员管理")) &&
+      isManagementSelected("管理中心");
+
+    setRole(nextRole);
+    if (losesPlatformOperations || losesManagementCenter) {
+      setSelected("专家");
+      setActiveSecondary(null);
+    }
+    setUserMenuOpen(false);
+    setFlyout(null);
+  };
+
   return (
     <div className="app-shell">
       <button className="mobile-menu" aria-label="打开导航" onClick={() => setMobileOpen(true)}>
@@ -321,10 +350,8 @@ export default function Home() {
 
       <aside className={`sidebar ${mobileOpen ? "is-mobile-open" : ""}`}>
         <div className="brand-row">
-          <div className="brand-mark" aria-hidden="true"><Sparkles size={18} strokeWidth={2.4} /></div>
-          <div className="brand-copy">
-            <strong>万悟</strong>
-            <span>工业智能体平台</span>
+          <div className="brand-logo-image" role="img" aria-label="平台 Logo">
+            <Sparkles size={25} strokeWidth={2.2} aria-hidden="true" />
           </div>
           <button className="mobile-close" aria-label="关闭导航" onClick={() => setMobileOpen(false)}><X size={18} /></button>
         </div>
@@ -332,7 +359,7 @@ export default function Home() {
         {orgOpen && <button className="org-menu-dismiss" aria-label="关闭组织切换" onClick={() => setOrgOpen(false)} />}
         <div className="org-switcher">
           <button className="org-trigger" aria-expanded={orgOpen} onClick={() => { setOrgOpen((value) => !value); setFlyout(null); setUserMenuOpen(false); }}>
-            <span className="org-trigger-icon"><Building2 size={17} strokeWidth={2} /></span>
+            <span className="org-trigger-icon"><UsersRound size={16} strokeWidth={2} /></span>
             <span className="org-name">{organization}</span>
             {orgOpen ? <ChevronDown className="org-chevron is-open" size={17} /> : <ChevronDown className="org-chevron" size={17} />}
           </button>
@@ -344,7 +371,7 @@ export default function Home() {
                   className={organization === item ? "active" : ""}
                   onClick={() => { setOrganization(item); setOrgOpen(false); }}
                 >
-                  <span className="org-option-icon"><UsersRound size={18} strokeWidth={2} /></span>
+                  <span className="org-option-icon"><UsersRound size={16} strokeWidth={2} /></span>
                   <span>{item}</span>
                   {organization === item && <Check size={15} />}
                 </button>
@@ -406,7 +433,7 @@ export default function Home() {
             return (
               <Fragment key={group.label}>
               <button key={group.label} className={`nav-item ${selected === group.label ? "active" : ""}`} onClick={() => selectPage(group.label)}>
-                <Icon size={18} strokeWidth={1.9} />
+                <Icon className={group.label === "专家" ? "expert-nav-icon" : undefined} size={18} strokeWidth={1.9} />
                 <span className="nav-label">{group.label}</span>
                 {group.badge && <span className="new-badge">{group.badge}</span>}
                 {(group.label === "本体智能体" || group.label === "资产广场") && <ChevronRight className="nav-chevron" size={15} />}
@@ -441,7 +468,7 @@ export default function Home() {
           <button className={`nav-item ${selected === "统计看板" ? "active" : ""}`} onClick={() => selectPage("统计看板")}>
             <BarChart3 size={18} strokeWidth={1.9} /><span className="nav-label">统计看板</span>
           </button>
-          {role === "system" && (
+          {canViewPlatformOperations && (
             <button
               className={`nav-item ${isManagementSelected("平台运营") ? "active" : ""}`}
               onMouseEnter={(event) => showMenuFlyout("平台运营", managementItems.平台运营, event.currentTarget, true)}
@@ -452,21 +479,17 @@ export default function Home() {
               <ShieldCheck size={18} strokeWidth={1.9} /><span className="nav-label">平台运营</span><ChevronRight className="nav-chevron" size={15} />
             </button>
           )}
-          {role === "system" ? (
+          {canViewManagementCenter && (
             <button
               className={`nav-item ${isManagementSelected("管理中心") ? "active" : ""}`}
-              onMouseEnter={(event) => showMenuFlyout("管理中心", managementItems.管理中心, event.currentTarget, true)}
+              onMouseEnter={(event) => showMenuFlyout("管理中心", visibleManagementItems, event.currentTarget, true)}
               onMouseLeave={scheduleFlyoutClose}
-              onFocus={(event) => showMenuFlyout("管理中心", managementItems.管理中心, event.currentTarget, true)}
+              onFocus={(event) => showMenuFlyout("管理中心", visibleManagementItems, event.currentTarget, true)}
               onBlur={scheduleFlyoutClose}
             >
               <Settings2 size={18} strokeWidth={1.9} /><span className="nav-label">管理中心</span><ChevronRight className="nav-chevron" size={15} />
             </button>
-          ) : role === "org" ? (
-            <button className={`nav-item ${selected === "人员管理" ? "active" : ""}`} onClick={() => selectPage("人员管理")}>
-              <Settings2 size={18} strokeWidth={1.9} /><span className="nav-label">管理中心</span>
-            </button>
-          ) : null}
+          )}
         </div>
 
         <div className="sidebar-footer">
@@ -478,8 +501,21 @@ export default function Home() {
             aria-expanded={userMenuOpen}
             onClick={() => { setUserMenuOpen((value) => !value); setOrgOpen(false); setFlyout(null); }}
           >
-            <MoreHorizontal size={18} />
+            <MoreVertical size={18} />
           </button>
+        </div>
+
+        <div className="role-switcher-outside" role="group" aria-label="切换用户角色">
+          {roles.map((item) => (
+            <button
+              key={item.value}
+              className={role === item.value ? "active" : ""}
+              aria-pressed={role === item.value}
+              onClick={() => switchRole(item.value)}
+            >
+              {item.label}
+            </button>
+          ))}
         </div>
 
         {userMenuOpen && (
@@ -551,7 +587,7 @@ function Marketplace({ assetType }: { assetType: AssetType }) {
   const [category, setCategory] = useState("全部");
   const categories = assetCategories[assetType];
   const assets = assetCatalog[assetType];
-  const typeIcons: Record<AssetType, LucideIcon> = { 智能体: Bot, 技能: WandSparkles, 插件: Blocks, MCP: RadioTower, 模型: BrainCircuit };
+  const typeIcons: Record<AssetType, LucideIcon> = { 智能体: Bot, 技能: WandSparkles, 插件: Blocks, MCP: RadioTower, 模型: Cpu };
   const ActiveTypeIcon = typeIcons[assetType];
   const filtered = assets.filter((agent) =>
     (category === "全部" || agent.tag === category) &&
@@ -608,6 +644,7 @@ function Marketplace({ assetType }: { assetType: AssetType }) {
 
 function PlaceholderPage({ selected }: { selected: string }) {
   const profiles: Record<string, { labels: string[]; values: string[]; panel: string }> = {
+    Unibot: { labels: ["今日会话", "任务完成率", "可用工具", "知识资源"], values: ["186", "97.2%", "28", "1,248"], panel: "Unibot 调用趋势" },
     本体智能体: { labels: ["智能体总数", "运行中", "任务完成率", "今日执行"], values: ["24", "18", "96.4%", "386"], panel: "任务执行趋势" },
     智能体开发: { labels: ["智能体项目", "已发布", "调试中", "本周更新"], values: ["32", "21", "7", "12"], panel: "开发活跃度" },
     资源库: { labels: ["资源总数", "知识资源", "工具资源", "本周新增"], values: ["1,248", "836", "412", "46"], panel: "资源使用趋势" },
