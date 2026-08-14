@@ -192,17 +192,20 @@ button { color: inherit; }
 .sidebar.is-collapsed .nav-item { height: 42px; justify-content: center; padding: 0; }
 .sidebar.is-collapsed .nav-label, .sidebar.is-collapsed .new-badge { display: none; }
 
-.utility-nav { 
+.utility-nav {
   position: relative;
   z-index: 30;
   flex: 0 0 auto;
   padding: 3px 10px 4px;
+  background: #fff;
+}
+.utility-nav.has-boundary-glass {
   background: rgba(255, 255, 255, .88);
   box-shadow: 0 -5px 12px rgba(35, 43, 56, .045);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
-.utility-nav::before { content: ""; position: absolute; right: 0; bottom: 100%; left: 0; height: 7px; pointer-events: none; background: linear-gradient(to top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0)); }
+.utility-nav.has-boundary-glass::before { content: ""; position: absolute; right: 0; bottom: 100%; left: 0; height: 7px; pointer-events: none; background: linear-gradient(to top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0)); }
 .utility-nav::after { content: ""; position: absolute; top: 0; right: 12px; left: 12px; height: 1px; pointer-events: none; background: rgba(224, 228, 234, .52); }
 .utility-nav .nav-item { height: 31px; margin: 0; }
 .sidebar.is-collapsed .utility-nav { padding: 4px 9px 5px; }

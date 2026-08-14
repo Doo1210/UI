@@ -244,7 +244,9 @@ export default function Home() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [organization, setOrganization] = useState(organizations[0]);
   const [ontologyPageKey, setOntologyPageKey] = useState(0);
+  const [hasBoundaryMenu, setHasBoundaryMenu] = useState(false);
   const [flyout, setFlyout] = useState<{ title: string; items: NavItem[]; top: number } | null>(null);
+  const businessNavRef = useRef<HTMLElement | null>(null);
   const flyoutCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentRole = roles.find((item) => item.value === role)!;
@@ -263,6 +265,37 @@ export default function Home() {
       if (flyoutCloseTimer.current) clearTimeout(flyoutCloseTimer.current);
     };
   }, []);
+
+  useEffect(() => {
+    const navigation = businessNavRef.current;
+    if (!navigation) return;
+
+    const updateBoundaryState = () => {
+      const buttons = navigation.querySelectorAll("button");
+      const lastButton = buttons[buttons.length - 1];
+      if (!lastButton) {
+        setHasBoundaryMenu(false);
+        return;
+      }
+
+      const navigationBottom = navigation.getBoundingClientRect().bottom;
+      const lastButtonBottom = lastButton.getBoundingClientRect().bottom;
+      setHasBoundaryMenu(lastButtonBottom >= navigationBottom - 18);
+    };
+
+    const frame = window.requestAnimationFrame(updateBoundaryState);
+    const resizeObserver = new ResizeObserver(updateBoundaryState);
+    resizeObserver.observe(navigation);
+    navigation.addEventListener("scroll", updateBoundaryState, { passive: true });
+    window.addEventListener("resize", updateBoundaryState);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+      navigation.removeEventListener("scroll", updateBoundaryState);
+      window.removeEventListener("resize", updateBoundaryState);
+    };
+  }, [activeSecondary, role, mobileOpen]);
 
   const selectPage = (label: string) => {
     if (label === "本体智能体") setOntologyPageKey((value) => value + 1);
@@ -381,7 +414,7 @@ export default function Home() {
         </div>
 
         {activeSecondary === "ontology" ? (
-          <nav className="business-nav secondary-business-nav" aria-label="本体智能体二级导航">
+          <nav ref={businessNavRef} className="business-nav secondary-business-nav" aria-label="本体智能体二级导航">
             <button className="secondary-business-back" onClick={() => setActiveSecondary(null)}>
               <ChevronLeft size={17} />
               <span>本体智能体</span>
@@ -409,7 +442,7 @@ export default function Home() {
             </div>
           </nav>
         ) : activeSecondary === "plaza" ? (
-          <nav className="business-nav secondary-business-nav" aria-label="资产广场二级导航">
+          <nav ref={businessNavRef} className="business-nav secondary-business-nav" aria-label="资产广场二级导航">
             <button className="secondary-business-back" onClick={() => setActiveSecondary(null)}>
               <ChevronLeft size={17} />
               <span>资产广场</span>
@@ -427,7 +460,7 @@ export default function Home() {
             </div>
           </nav>
         ) : (
-        <nav className="business-nav" aria-label="核心业务导航">
+        <nav ref={businessNavRef} className="business-nav" aria-label="核心业务导航">
           {businessNav.filter((group) => !group.items).map((group) => {
             const Icon = group.icon;
             return (
@@ -461,7 +494,7 @@ export default function Home() {
         </nav>
         )}
 
-        <div className="utility-nav">
+        <div className={`utility-nav ${hasBoundaryMenu ? "has-boundary-glass" : ""}`}>
           <button className={`nav-item ${selected === "API Key管理" ? "active" : ""}`} onClick={() => selectPage("API Key管理")}>
             <KeyRound size={18} strokeWidth={1.9} /><span className="nav-label">API Key管理</span>
           </button>
