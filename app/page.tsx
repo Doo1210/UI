@@ -175,9 +175,7 @@ const agents = [
   },
 ];
 
-const assetTypes = ["智能体", "技能", "插件", "MCP", "模型"] as const;
-type AssetType = (typeof assetTypes)[number];
-type PlazaScheme = "tabs" | "secondary";
+type AssetType = "智能体" | "技能" | "插件" | "MCP" | "模型";
 
 const assetTypeNavigation: { label: AssetType; menuLabel: string; icon: LucideIcon }[] = [
   { label: "智能体", menuLabel: "智能体广场", icon: Bot },
@@ -196,12 +194,6 @@ const ontologyDataItems: NavItem[] = [
   { label: "连接管理", icon: Database },
   { label: "扫描管理", icon: ScanEye },
   { label: "数据视图", icon: LayoutDashboard },
-];
-
-const ontologyTabsNav: NavItem[] = [
-  { label: "本体智能体", icon: UserRoundCog },
-  { label: "知识网络", icon: Workflow },
-  { label: "数据连接", icon: Database },
 ];
 
 const assetCategories: Record<AssetType, string[]> = {
@@ -239,7 +231,6 @@ const assetCatalog: Record<AssetType, typeof agents> = {
 export default function Home() {
   const role: Role = "system";
   const [selected, setSelected] = useState("专家");
-  const [plazaScheme, setPlazaScheme] = useState<PlazaScheme>("secondary");
   const [assetType, setAssetType] = useState<AssetType>("智能体");
   const [activeSecondary, setActiveSecondary] = useState<"plaza" | "ontology" | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -271,9 +262,9 @@ export default function Home() {
     if (label === "本体智能体") setOntologyPageKey((value) => value + 1);
     setSelected(label);
     setActiveSecondary(
-      plazaScheme === "secondary" && label === "本体智能体"
+      label === "本体智能体"
         ? "ontology"
-        : plazaScheme === "secondary" && label === "资产广场"
+        : label === "资产广场"
           ? "plaza"
           : null,
     );
@@ -410,7 +401,7 @@ export default function Home() {
           </nav>
         ) : (
         <nav className="business-nav" aria-label="核心业务导航">
-          {businessNav.filter((group) => !group.items && (plazaScheme === "secondary" || group.label !== "本体智能体")).map((group) => {
+          {businessNav.filter((group) => !group.items).map((group) => {
             const Icon = group.icon;
             return (
               <Fragment key={group.label}>
@@ -418,24 +409,8 @@ export default function Home() {
                 <Icon size={18} strokeWidth={1.9} />
                 <span className="nav-label">{group.label}</span>
                 {group.badge && <span className="new-badge">{group.badge}</span>}
-                {(group.label === "本体智能体" || (plazaScheme === "secondary" && group.label === "资产广场")) && <ChevronRight className="nav-chevron" size={15} />}
+                {(group.label === "本体智能体" || group.label === "资产广场") && <ChevronRight className="nav-chevron" size={15} />}
               </button>
-              {plazaScheme === "tabs" && group.label === "专家" && (
-                <div className="nav-section ontology-inline-section">
-                  <div className="nav-section-label">本体智能体</div>
-                  <div className="nav-section-items">
-                    {ontologyTabsNav.map((item) => {
-                      const ItemIcon = item.icon;
-                      return (
-                        <button key={item.label} className={`nav-item ${selected === item.label ? "active" : ""}`} onClick={() => selectPage(item.label)}>
-                          <ItemIcon size={18} strokeWidth={1.9} />
-                          <span className="nav-label">{item.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
               </Fragment>
             );
           })}
@@ -552,10 +527,8 @@ export default function Home() {
         <section className="content">
           {selected === "资产广场" ? (
             <Marketplace
-              key={`${plazaScheme}-${assetType}`}
+              key={assetType}
               assetType={assetType}
-              showTypeTabs={plazaScheme === "tabs"}
-              onAssetTypeChange={setAssetType}
             />
           ) : (
             selected === "本体智能体" ? <OntologyAgentPage key={ontologyPageKey} />
@@ -569,23 +542,11 @@ export default function Home() {
         </section>
       </main>
 
-      <div className="scheme-comparison" aria-label="资产广场方案对比">
-        <span>方案对比</span>
-        <div>
-          <button className={plazaScheme === "secondary" ? "active" : ""} onClick={() => { setPlazaScheme("secondary"); if (selected === "资产广场") setActiveSecondary("plaza"); }}>方案一 <small>覆盖侧栏</small></button>
-          <button className={plazaScheme === "tabs" ? "active" : ""} onClick={() => {
-            setPlazaScheme("tabs");
-            if (activeSecondary === "plaza") setActiveSecondary(null);
-            if (activeSecondary === "ontology") setActiveSecondary(null);
-            if (["本体智能体", "连接管理", "扫描管理", "数据视图"].includes(selected)) setSelected("数据连接");
-          }}>方案二 <small>顶部 Tab</small></button>
-        </div>
-      </div>
     </div>
   );
 }
 
-function Marketplace({ assetType, showTypeTabs, onAssetTypeChange }: { assetType: AssetType; showTypeTabs: boolean; onAssetTypeChange: (type: AssetType) => void }) {
+function Marketplace({ assetType }: { assetType: AssetType }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("全部");
   const categories = assetCategories[assetType];
@@ -597,26 +558,8 @@ function Marketplace({ assetType, showTypeTabs, onAssetTypeChange }: { assetType
     (agent.name.includes(query) || agent.desc.includes(query)),
   );
 
-  const changeAssetType = (nextType: AssetType) => {
-    onAssetTypeChange(nextType);
-    setCategory("全部");
-    setQuery("");
-  };
-
   return (
     <>
-      {showTypeTabs && <div className="asset-type-tabs" role="tablist" aria-label="资产类型">
-        {assetTypes.map((item) => {
-          const TypeIcon = typeIcons[item];
-          return (
-            <button key={item} role="tab" aria-selected={assetType === item} className={assetType === item ? "active" : ""} onClick={() => changeAssetType(item)}>
-              <TypeIcon size={17} strokeWidth={1.9} />
-              <span>{item}</span>
-            </button>
-          );
-        })}
-      </div>}
-
       <div className="explore-toolbar">
         <div className="category-tabs" aria-label={`${assetType}分类`}>
           {categories.map((item) => <button key={item} className={category === item ? "active" : ""} onClick={() => setCategory(item)}>{item}</button>)}

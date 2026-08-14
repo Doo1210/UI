@@ -311,15 +311,6 @@ button { color: inherit; }
 .secondary-nav button span { flex: 1; text-align: left; }
 .secondary-section-label { margin: 10px 0 3px; padding: 7px 10px 5px; color: #9ca3b2; font-size: 9px; font-weight: 650; letter-spacing: .06em; }
 
-.scheme-comparison { position: fixed; right: 22px; bottom: 20px; z-index: 45; padding: 7px; border: 1px solid #dfe7f1; border-radius: 13px; background: rgba(255,255,255,.94); box-shadow: 0 12px 32px rgba(27, 65, 110, .15); backdrop-filter: blur(14px); }
-.scheme-comparison > span { display: block; padding: 2px 5px 6px; color: #98a2b1; font-size: 8px; font-weight: 650; letter-spacing: .05em; }
-.scheme-comparison > div { display: flex; gap: 3px; }
-.scheme-comparison button { min-width: 92px; height: 36px; padding: 0 10px; border: 0; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; color: #687386; background: transparent; font-size: 10px; cursor: pointer; }
-.scheme-comparison button small { margin-top: 2px; color: #a0a8b5; font-size: 8px; }
-.scheme-comparison button:hover { color: var(--primary-dark); background: #f5f9fe; }
-.scheme-comparison button.active { color: var(--primary-dark); background: var(--primary-soft); font-weight: 650; }
-.scheme-comparison button.active small { color: #6f98ca; }
-
 .content { max-width: 1500px; margin: 0 auto; padding: 18px clamp(22px, 3vw, 42px) 48px; }
 
 .hero-strip {
@@ -602,7 +593,6 @@ button { color: inherit; }
 }
 
 @media (max-width: 680px) {
-  .scheme-comparison { right: 12px; bottom: 12px; }
   .hero-strip { min-height: 260px; padding: 28px 24px; align-items: flex-start; }
   .hero-copy { max-width: 100%; }.hero-copy h2 { font-size: 21px; }.hero-copy p { max-width: 90%; }
   .hero-visual { right: -55px; bottom: -40px; opacity: .45; }
