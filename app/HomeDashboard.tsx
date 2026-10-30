@@ -160,15 +160,11 @@ export function HomeDashboard({
     if (!element) return;
     let frame = 0;
     const fit = () => {
-      element.style.zoom = "1";
       element.style.removeProperty("--overview-height");
-      if (window.innerWidth < 1000) return;
+      if (window.innerWidth < 1181 || window.innerHeight < 800) return;
       const top = element.getBoundingClientRect().top;
       const available = Math.max(1, window.innerHeight - top - 16);
-      const natural = element.scrollHeight;
-      const scale = Math.min(1, available / natural);
-      element.style.zoom = String(scale);
-      element.style.setProperty("--overview-height", `${available / scale}px`);
+      element.style.setProperty("--overview-height", `${available}px`);
     };
     const schedule = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(fit); };
     let lastWidth = 0;

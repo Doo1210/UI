@@ -1,6 +1,6 @@
 # 首页与侧边栏对照截图（2026-10-29）
 
-本目录保存用户提供的二十四张原始 PNG 及四份视觉风格要求，按消息顺序重命名。图片复制后已逐张核对 SHA-256，未裁剪或压缩。
+本目录保存用户提供的二十五张原始 PNG 及四份视觉风格要求，按消息顺序重命名。图片复制后已逐张核对 SHA-256，未裁剪或压缩。
 
 - [01-current-home.png](01-current-home.png)：当前改版原型首页。
 - [02-sidebar-version-a.png](02-sidebar-version-a.png)：侧边栏版本 A，偏“应用广场 / 开发中心 / 插件广场 / 模型中心”。
@@ -30,5 +30,6 @@
 - [26-overview-tools-before-local-accents.png](26-overview-tools-before-local-accents.png)：总览与高级功能局部加色前，后增加极浅蓝标题栏和小面积图标底座。
 - [27-app-count-section-before-heading.png](27-app-count-section-before-heading.png)：专家与工作流数量区域添加“智能应用”标题前的参考截图。
 - [28-overview-before-token-metric.png](28-overview-before-token-metric.png)：新增第三组 Token 消耗前的参考截图，时间单位随后统一为“日”。
+- [29-overview-before-shared-height-adaptation.png](29-overview-before-shared-height-adaptation.png)：动态适配修正前，应用概况单独拉伸、统计标题和数值距离较大。
 
 侧边栏截图用于讨论信息架构；其中的入口名称不能单独作为生产服务已上线的证据。现有平台能力以 `D:\CodingWorkSpace\wanwu\wanwu-web` 和 `D:\CodingWorkSpace\wanwu\wanwu` 源码为准。
