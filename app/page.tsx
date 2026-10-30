@@ -246,7 +246,7 @@ export default function Home() {
   const [assetType, setAssetType] = useState<AssetType>("专家");
   const [activeSecondary, setActiveSecondary] = useState<PlatformId | null>(null);
   const [organization, setOrganization] = useState(organizations[0]);
-  const [platformStatusesByOrg, setPlatformStatusesByOrg] = useState<Record<string, Record<PlatformId, PlatformStatus>>>({ [organizations[0]]: { ...unavailablePlatforms, ontology: "active" } });
+  const [platformStatusesByOrg, setPlatformStatusesByOrg] = useState<Record<string, Record<PlatformId, PlatformStatus>>>({ [organizations[0]]: { ...unavailablePlatforms, ontology: "active", vision: "active" } });
   const [platformApplications, setPlatformApplications] = useState<Record<string, PlatformApplication>>({});
   const platformStatuses = platformStatusesByOrg[organization] ?? unavailablePlatforms;
   const [highCodeStatusesByOrg, setHighCodeStatusesByOrg] = useState<Record<string, PlatformStatus>>({ [organizations[0]]: "active" });

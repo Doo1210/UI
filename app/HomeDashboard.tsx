@@ -159,24 +159,38 @@ export function HomeDashboard({
     const element = overviewRef.current;
     if (!element) return;
     let frame = 0;
+    let active = true;
     const fit = () => {
+      if (!active) return;
       element.style.removeProperty("--overview-height");
-      if (window.innerWidth < 1181 || window.innerHeight < 800) return;
-      const top = element.getBoundingClientRect().top;
-      const available = Math.max(1, window.innerHeight - top - 16);
+      element.dataset.overviewFit = "natural";
+      const viewportHeight = Math.min(window.innerHeight, window.visualViewport?.height ?? window.innerHeight);
+      const top = element.getBoundingClientRect().top + window.scrollY;
+      const available = Math.floor(viewportHeight - top - 16);
+      if (window.innerWidth < 1000 || available < 540) return;
       element.style.setProperty("--overview-height", `${available}px`);
+      const densities = available >= 760 ? ["standard", "compact", "dense"] : available >= 640 ? ["compact", "dense"] : ["dense"];
+      for (const density of densities) {
+        element.dataset.overviewFit = density;
+        const panels = element.querySelectorAll<HTMLElement>(".home-core-area, .home-work-panel, .home-advanced-services, .home-platforms, .home-platform-card");
+        const overflow = element.scrollHeight > available + 2 || Array.from(panels).some(panel => panel.scrollHeight > panel.clientHeight + 2);
+        if (!overflow) return;
+      }
+      element.dataset.overviewFit = "natural";
+      element.style.removeProperty("--overview-height");
     };
-    const schedule = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(fit); };
+    const schedule = () => { if (!active) return; cancelAnimationFrame(frame); frame = requestAnimationFrame(fit); };
     let lastWidth = 0;
     const observer = new ResizeObserver(entries => {
       const width = entries[0]?.contentRect.width ?? 0;
-      if (width !== lastWidth) { lastWidth = width; schedule(); }
+      if (Math.abs(width - lastWidth) > 1) { lastWidth = width; schedule(); }
     });
     if (element.parentElement) observer.observe(element.parentElement);
     window.addEventListener("resize", schedule);
+    window.visualViewport?.addEventListener("resize", schedule);
     document.fonts.ready.then(schedule);
     fit();
-    return () => { cancelAnimationFrame(frame); observer.disconnect(); window.removeEventListener("resize", schedule); };
+    return () => { active = false; cancelAnimationFrame(frame); observer.disconnect(); window.removeEventListener("resize", schedule); window.visualViewport?.removeEventListener("resize", schedule); };
   }, []);
   const [usageRange, setUsageRange] = useState<UsageRange>("month");
   const [tokenRange, setTokenRange] = useState<UsageRange>("month");
