@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   CircleHelp,
+  Code2,
   Cpu,
   Database,
   Eye,
@@ -46,7 +47,6 @@ import {
   Search,
   Send,
   Settings2,
-  Share2,
   ShieldCheck,
   SlidersHorizontal,
   Sparkles,
@@ -56,13 +56,16 @@ import {
   UserRoundCog,
   UserRound,
   UsersRound,
-  WandSparkles,
-  Webhook,
   Workflow,
   X,
   type LucideIcon,
 } from "lucide-react";
-import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { HomeDashboard, IndustrialWorkspace, industrialPlatforms, type PlatformId, type PlatformStatus } from "./HomeDashboard";
+import { FeatureIntroduction, type FeatureId } from "./FeatureIntroduction";
+import { PlatformIntroduction, type PlatformApplication } from "./PlatformIntroduction";
+import { LowCodeWorkspace, MainWorkspace } from "./MainWorkspaces";
+import { LegacyPreview } from "./LegacyPreview";
 
 type Role = "system" | "org" | "operator" | "user";
 type NavItem = { label: string; icon: LucideIcon; badge?: string };
@@ -73,41 +76,43 @@ type NavGroup = {
   badge?: string;
 };
 
-const businessNav: NavGroup[] = [
-  { label: "Unibot", icon: Bot },
-  { label: "专家", icon: BadgeCheck, badge: "BETA" },
-  { label: "本体智能体", icon: Share2 },
+const primaryNav: NavGroup[] = [
+  { label: "总览", icon: LayoutDashboard },
   { label: "资产广场", icon: Store },
+];
+
+const businessNav: NavGroup[] = [
   {
-    label: "开发中心",
+    label: "智能应用",
     icon: Workflow,
     items: [
-      { label: "智能体开发", icon: PanelsTopLeft },
-      { label: "资源库", icon: LibraryBig },
+      { label: "专家", icon: BadgeCheck },
+      { label: "工作流", icon: GitFork },
     ],
-  },
-  {
-    label: "事件中心",
-    icon: Webhook,
-    items: [
-      { label: "事件接入", icon: RadioTower },
-      { label: "事件任务", icon: ListChecks },
-    ],
-  },
-  {
-    label: "部署运行",
-    icon: Activity,
-    items: [
-      { label: "智能体运行时", icon: Gauge },
-      { label: "镜像仓库", icon: Box },
-    ],
-  },
-  {
-    label: "工业引擎",
-    icon: Factory,
-    items: [{ label: "视觉引擎", icon: ScanEye }],
   },
 ];
+
+const standaloneNav: NavGroup[] = [
+  { label: "事件中心", icon: RadioTower },
+  { label: "智能应用洞察", icon: BarChart3 },
+];
+
+const advancedNav: NavItem[] = [
+  { label: "软件开发套件", icon: Code2 },
+  { label: "低代码 UI", icon: PanelsTopLeft },
+];
+
+const capabilityNav: NavGroup = {
+  label: "能力中心",
+  icon: Blocks,
+  items: [
+    { label: "模型中心", icon: Cpu },
+    { label: "知识中心", icon: BrainCircuit },
+    { label: "资源库", icon: LibraryBig },
+  ],
+};
+
+const mainWorkspaceLabels = new Set(["专家", "工作流", "智能体运行时", "软件开发套件", "模型中心", "知识中心", "资源库", "事件中心", "智能应用洞察"]);
 
 const managementItems: Record<string, NavItem[]> = {
   平台运营: [
@@ -127,8 +132,16 @@ const roles: { value: Role; label: string; short: string }[] = [
   { value: "operator", label: "运营人员", short: "运" },
   { value: "user", label: "普通用户", short: "普" },
 ];
+const roleMenuDefaults: Record<Role, { operations: boolean; management: boolean }> = {
+  system: { operations: true, management: true },
+  org: { operations: false, management: true },
+  operator: { operations: true, management: false },
+  user: { operations: false, management: false },
+};
 
 const organizations = ["--- 系统 ---", "测试", "测试 - 测试1", "测试 - 测试1 - 测试11"];
+const organizationLabel = (value: string) => value === organizations[0] ? "系统空间" : value.replaceAll(" - ", " / ");
+const unavailablePlatforms: Record<PlatformId, PlatformStatus> = { ontology: "available", vision: "available", timeseries: "available", design: "available" };
 
 const agents = [
   {
@@ -181,51 +194,41 @@ const agents = [
   },
 ];
 
-type AssetType = "智能体" | "技能" | "插件" | "MCP" | "模型";
+type AssetType = "专家" | "工作流" | "解决方案" | "工具" | "模型";
 
 const assetTypeNavigation: { label: AssetType; menuLabel: string; icon: LucideIcon }[] = [
-  { label: "智能体", menuLabel: "智能体", icon: Sparkles },
-  { label: "技能", menuLabel: "技能", icon: WandSparkles },
-  { label: "插件", menuLabel: "插件", icon: Blocks },
-  { label: "MCP", menuLabel: "MCP", icon: RadioTower },
+  { label: "专家", menuLabel: "专家", icon: BadgeCheck },
+  { label: "工作流", menuLabel: "工作流", icon: Workflow },
+  { label: "解决方案", menuLabel: "解决方案", icon: PackageOpen },
+  { label: "工具", menuLabel: "工具", icon: Blocks },
   { label: "模型", menuLabel: "模型", icon: Cpu },
 ];
 
-const ontologyPrimaryItems: NavItem[] = [
-  { label: "本体智能体", icon: UserRoundCog },
-  { label: "知识网络", icon: Workflow },
-];
-
-const ontologyDataItems: NavItem[] = [
-  { label: "连接管理", icon: Database },
-  { label: "扫描管理", icon: ScanEye },
-  { label: "数据视图", icon: LayoutDashboard },
-];
-
 const assetCategories: Record<AssetType, string[]> = {
-  智能体: ["全部", "设备运维", "质量管理", "安全生产", "工艺优化", "能源管理", "知识服务"],
-  技能: ["全部", "数据处理", "内容生成", "知识检索", "流程自动化"],
-  插件: ["全部", "生产系统", "数据连接", "消息通知", "效率工具"],
-  MCP: ["全部", "数据库", "文件系统", "企业应用", "开发工具"],
+  专家: ["全部", "设备运维", "质量管理", "安全生产", "工艺优化", "能源管理", "知识服务"],
+  工作流: ["全部", "设备运维", "质量管理", "生产协同"],
+  解决方案: ["全部", "质量管理", "设备运维", "知识服务"],
+  工具: ["全部", "生产系统", "数据连接", "消息通知", "知识检索"],
   模型: ["全部", "通用语言", "工业视觉", "向量模型", "代码模型"],
 };
 
 const assetCatalog: Record<AssetType, typeof agents> = {
-  智能体: agents,
-  技能: [
-    { name: "设备数据清洗", desc: "自动识别异常值、缺失值和重复数据，形成标准设备数据集。", tag: "数据处理", uses: "1.6k", tone: "blue", icon: Database },
-    { name: "工业报告生成", desc: "根据生产与运营数据，生成结构化周报、月报和分析摘要。", tag: "内容生成", uses: "1.2k", tone: "violet", icon: FileKey2 },
-    { name: "企业知识检索", desc: "跨知识库检索专业资料，并返回带来源的精确答案。", tag: "知识检索", uses: "2.1k", tone: "indigo", icon: Search },
+  专家: agents,
+  工作流: [
+    { name: "设备异常处置工作流", desc: "接收设备异常事件，组织诊断、审批和维修派单。", tag: "设备运维", uses: "1.6k", tone: "blue", icon: Workflow },
+    { name: "质量异常闭环工作流", desc: "从视觉告警到人工复核、原因分析和结果回写。", tag: "质量管理", uses: "1.2k", tone: "violet", icon: GitFork },
+    { name: "生产任务协同工作流", desc: "结合订单、产能和库存数据推动生产任务协作。", tag: "生产协同", uses: "986", tone: "indigo", icon: ListChecks },
   ],
-  插件: [
+  解决方案: [
+    { name: "视觉质检闭环", desc: "组合视觉告警、质量专家和处置工作流，追踪每一次缺陷处理。", tag: "质量管理", uses: "754", tone: "cyan", icon: ScanEye },
+    { name: "设备故障诊断", desc: "结合时序异常、设备关系和检修知识形成诊断与维修建议。", tag: "设备运维", uses: "632", tone: "orange", icon: Activity },
+    { name: "工业知识服务", desc: "汇聚规程与现场资料，为团队提供有出处的知识问答。", tag: "知识服务", uses: "1.1k", tone: "green", icon: BrainCircuit },
+  ],
+  工具: [
     { name: "MES 数据连接器", desc: "连接主流制造执行系统，读取工单、产量与质量数据。", tag: "生产系统", uses: "1.4k", tone: "violet", icon: Blocks },
     { name: "企业微信通知", desc: "将智能体任务结果、异常与审批消息发送至企业微信。", tag: "消息通知", uses: "986", tone: "green", icon: MessageSquareText },
     { name: "OPC UA 设备接入", desc: "通过标准工业协议连接现场设备并订阅实时数据。", tag: "数据连接", uses: "764", tone: "orange", icon: RadioTower },
-  ],
-  MCP: [
-    { name: "PostgreSQL MCP", desc: "让智能体安全查询 PostgreSQL 数据库结构与业务数据。", tag: "数据库", uses: "1.1k", tone: "blue", icon: Database },
-    { name: "文件系统 MCP", desc: "在受控目录中读取、检索和管理企业文档与文件。", tag: "文件系统", uses: "832", tone: "cyan", icon: LibraryBig },
-    { name: "企业应用 MCP", desc: "统一连接企业内部应用，为智能体提供标准化工具接口。", tag: "企业应用", uses: "658", tone: "indigo", icon: RadioTower },
+    { name: "企业知识检索", desc: "跨知识库检索专业资料，并返回带来源的结果。", tag: "知识检索", uses: "2.1k", tone: "indigo", icon: Search },
   ],
   模型: [
     { name: "万悟工业大模型", desc: "面向工业知识问答、任务规划和复杂场景推理的通用模型。", tag: "通用语言", uses: "3.8k", tone: "violet", icon: BrainCircuit },
@@ -235,28 +238,62 @@ const assetCatalog: Record<AssetType, typeof agents> = {
 };
 
 export default function Home() {
+  const [legacyMode, setLegacyMode] = useState(false);
   const [role, setRole] = useState<Role>("system");
-  const [selected, setSelected] = useState("专家");
-  const [assetType, setAssetType] = useState<AssetType>("智能体");
-  const [activeSecondary, setActiveSecondary] = useState<"plaza" | "ontology" | null>(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [orgOpen, setOrgOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [showPlatformOperations, setShowPlatformOperations] = useState(roleMenuDefaults.system.operations);
+  const [showManagementCenter, setShowManagementCenter] = useState(roleMenuDefaults.system.management);
+  const [selected, setSelected] = useState("总览");
+  const [assetType, setAssetType] = useState<AssetType>("专家");
+  const [activeSecondary, setActiveSecondary] = useState<PlatformId | null>(null);
   const [organization, setOrganization] = useState(organizations[0]);
+  const [platformStatusesByOrg, setPlatformStatusesByOrg] = useState<Record<string, Record<PlatformId, PlatformStatus>>>({ [organizations[0]]: { ...unavailablePlatforms, ontology: "active" } });
+  const [platformApplications, setPlatformApplications] = useState<Record<string, PlatformApplication>>({});
+  const platformStatuses = platformStatusesByOrg[organization] ?? unavailablePlatforms;
+  const [highCodeStatusesByOrg, setHighCodeStatusesByOrg] = useState<Record<string, PlatformStatus>>({ [organizations[0]]: "active" });
+  const [highCodeApplications, setHighCodeApplications] = useState<Record<string, PlatformApplication>>({});
+  const highCodeStatus = highCodeStatusesByOrg[organization] ?? "available";
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [navTooltip, setNavTooltip] = useState<{ label: string; top: number } | null>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [organizationPickerOpen, setOrganizationPickerOpen] = useState(false);
   const [ontologyPageKey, setOntologyPageKey] = useState(0);
-  const [hasBoundaryMenu, setHasBoundaryMenu] = useState(false);
   const [flyout, setFlyout] = useState<{ title: string; items: NavItem[]; top: number } | null>(null);
-  const businessNavRef = useRef<HTMLElement | null>(null);
   const flyoutCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentRole = roles.find((item) => item.value === role)!;
   useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setSidebarCollapsed(window.localStorage.getItem("wanwu-sidebar-collapsed") === "true");
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  const toggleSidebar = () => {
+    const next = !sidebarCollapsed;
+    setSidebarCollapsed(next);
+    window.localStorage.setItem("wanwu-sidebar-collapsed", String(next));
+    setNavTooltip(null);
+    setFlyout(null);
+    setOrganizationPickerOpen(false);
+    setUserMenuOpen(false);
+  };
+
+  const showNavTooltip = (target: EventTarget | null) => {
+    if (!sidebarCollapsed || window.innerWidth <= 900 || !(target instanceof Element)) return;
+    const button = target.closest<HTMLElement>("[data-nav-tooltip]");
+    if (!button) return;
+    const rect = button.getBoundingClientRect();
+    setNavTooltip({ label: button.dataset.navTooltip ?? "", top: Math.max(12, Math.min(rect.top + rect.height / 2, window.innerHeight - 12)) });
+  };
+  useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setFlyout(null);
-        setOrgOpen(false);
+        setOrganizationPickerOpen(false);
         setUserMenuOpen(false);
         setMobileOpen(false);
+        setNavTooltip(null);
       }
     };
     window.addEventListener("keydown", onKey);
@@ -266,49 +303,11 @@ export default function Home() {
     };
   }, []);
 
-  useEffect(() => {
-    const navigation = businessNavRef.current;
-    if (!navigation) return;
-
-    const updateBoundaryState = () => {
-      const buttons = navigation.querySelectorAll("button");
-      const lastButton = buttons[buttons.length - 1];
-      if (!lastButton) {
-        setHasBoundaryMenu(false);
-        return;
-      }
-
-      const navigationBottom = navigation.getBoundingClientRect().bottom;
-      const lastButtonBottom = lastButton.getBoundingClientRect().bottom;
-      setHasBoundaryMenu(lastButtonBottom >= navigationBottom - 18);
-    };
-
-    const frame = window.requestAnimationFrame(updateBoundaryState);
-    const resizeObserver = new ResizeObserver(updateBoundaryState);
-    resizeObserver.observe(navigation);
-    navigation.addEventListener("scroll", updateBoundaryState, { passive: true });
-    window.addEventListener("resize", updateBoundaryState);
-
-    return () => {
-      window.cancelAnimationFrame(frame);
-      resizeObserver.disconnect();
-      navigation.removeEventListener("scroll", updateBoundaryState);
-      window.removeEventListener("resize", updateBoundaryState);
-    };
-  }, [activeSecondary, role, mobileOpen]);
-
   const selectPage = (label: string) => {
-    if (label === "本体智能体") setOntologyPageKey((value) => value + 1);
     setSelected(label);
-    setActiveSecondary(
-      label === "本体智能体"
-        ? "ontology"
-        : label === "资产广场"
-          ? "plaza"
-          : null,
-    );
+    setActiveSecondary(null);
     setFlyout(null);
-    setOrgOpen(false);
+    setOrganizationPickerOpen(false);
     setUserMenuOpen(false);
     setMobileOpen(false);
   };
@@ -317,9 +316,53 @@ export default function Home() {
     if (label === "本体智能体") setOntologyPageKey((value) => value + 1);
     setSelected(label);
     setFlyout(null);
-    setOrgOpen(false);
+    setOrganizationPickerOpen(false);
     setUserMenuOpen(false);
     setMobileOpen(false);
+  };
+
+  const openPlatform = (id: PlatformId) => {
+    setActiveSecondary(null);
+    setSelected(`platform:intro:${id}`);
+    setFlyout(null);
+    setMobileOpen(false);
+  };
+
+  const openFeature = (id: FeatureId) => {
+    setActiveSecondary(null);
+    setSelected(`service:intro:${id === "runtime" ? "high-code" : id}`);
+    setFlyout(null);
+    setMobileOpen(false);
+  };
+
+  const updateHighCodeStatus = (status: PlatformStatus) => {
+    if (status === "pending" && highCodeStatus !== "available") return;
+    if (status === "active" && (role !== "system" || highCodeStatus !== "pending")) return;
+    setHighCodeStatusesByOrg((byOrg) => ({ ...byOrg, [organization]: status }));
+  };
+
+  const enterHighCode = () => {
+    if (highCodeStatus === "active" && (role === "system" || role === "org")) selectPage("智能体运行时");
+  };
+
+  const enterPlatform = (id: PlatformId) => {
+    if (platformStatuses[id] !== "active") return;
+    const platform = industrialPlatforms.find((item) => item.id === id)!;
+    setActiveSecondary(id);
+    setSelected(platform.navigation[0].label);
+    if (id === "ontology") setOntologyPageKey((value) => value + 1);
+    setFlyout(null);
+    setMobileOpen(false);
+  };
+
+  const updatePlatformStatus = (id: PlatformId, status: PlatformStatus) => {
+    if (status === "pending" && platformStatuses[id] !== "available") return;
+    if (status === "active" && (role !== "system" || platformStatuses[id] !== "pending")) return;
+    setPlatformStatusesByOrg((byOrg) => ({ ...byOrg, [organization]: { ...(byOrg[organization] ?? unavailablePlatforms), [id]: status } }));
+  };
+
+  const activatePlatform = (id: PlatformId) => {
+    updatePlatformStatus(id, "active");
   };
 
   const cancelFlyoutClose = () => {
@@ -330,14 +373,29 @@ export default function Home() {
   const getFlyoutTop = (element: HTMLElement, itemCount: number, above: boolean) => {
     const rect = element.getBoundingClientRect();
     const height = 12 + itemCount * 36;
+    if (sidebarCollapsed && window.innerWidth > 900) {
+      const centeredTop = rect.top + rect.height / 2 - height / 2;
+      return Math.max(12, Math.min(centeredTop, window.innerHeight - height - 12));
+    }
+    const topEdge = above ? (element.closest(".utility-nav")?.getBoundingClientRect().top ?? rect.top) : rect.top;
     return above
-      ? Math.max(16, rect.top - height - 8)
+      ? Math.max(16, topEdge - height - 8)
       : Math.max(16, Math.min(rect.top - 8, window.innerHeight - height - 16));
   };
 
   const showMenuFlyout = (title: string, items: NavItem[], element: HTMLElement, above = false) => {
     cancelFlyoutClose();
     setFlyout({ title, items, top: getFlyoutTop(element, items.length, above) });
+  };
+
+  const toggleMenuFlyout = (title: string, items: NavItem[], element: HTMLElement) => {
+    setOrganizationPickerOpen(false);
+    setUserMenuOpen(false);
+    if (flyout?.title === title) {
+      setFlyout(null);
+    } else {
+      showMenuFlyout(title, items, element, true);
+    }
   };
 
   const scheduleFlyoutClose = () => {
@@ -350,28 +408,52 @@ export default function Home() {
   const isManagementSelected = (label: string) =>
     selected === label || managementItems[label]?.some((item) => item.label === selected);
 
-  const canViewPlatformOperations = role === "system" || role === "operator";
-  const canViewManagementCenter = role === "system" || role === "org";
-  const visibleManagementItems = role === "org"
+  const featureIntroId: FeatureId | null = selected === "service:intro:high-code" ? "runtime" : selected === "service:intro:sdk" ? "sdk" : selected === "service:intro:lowcode" ? "lowcode" : null;
+  const canManageHighCode = role === "system" || role === "org";
+  const activePlatform = activeSecondary ? industrialPlatforms.find((item) => item.id === activeSecondary) : null;
+  const introPlatform = selected.startsWith("platform:intro:")
+    ? industrialPlatforms.find((item) => item.id === selected.slice("platform:intro:".length))
+    : null;
+  const visibleManagementItems = role !== "system"
     ? managementItems.管理中心.filter((item) => item.label === "人员管理")
     : managementItems.管理中心;
 
   const switchRole = (nextRole: Role) => {
+    const nextMenus = roleMenuDefaults[nextRole];
     const losesPlatformOperations =
-      nextRole !== "system" && nextRole !== "operator" && isManagementSelected("平台运营");
+      !nextMenus.operations && isManagementSelected("平台运营");
     const losesManagementCenter =
-      ((nextRole !== "system" && nextRole !== "org") ||
+      ((!nextMenus.management) ||
         (nextRole === "org" && selected !== "人员管理")) &&
       isManagementSelected("管理中心");
+    const losesHighCode = nextRole !== "system" && nextRole !== "org" && selected === "智能体运行时";
 
     setRole(nextRole);
-    if (losesPlatformOperations || losesManagementCenter) {
-      setSelected("专家");
+    setShowPlatformOperations(nextMenus.operations);
+    setShowManagementCenter(nextMenus.management);
+    if (losesPlatformOperations || losesManagementCenter || losesHighCode) {
+      setSelected("总览");
       setActiveSecondary(null);
     }
+    setOrganizationPickerOpen(false);
     setUserMenuOpen(false);
     setFlyout(null);
   };
+
+  const toggleDemoMenu = (menu: "operations" | "management") => {
+    if (menu === "operations") {
+      const next = !showPlatformOperations;
+      setShowPlatformOperations(next);
+      if (!next && isManagementSelected("平台运营")) selectPage("总览");
+    } else {
+      const next = !showManagementCenter;
+      setShowManagementCenter(next);
+      if (!next && isManagementSelected("管理中心")) selectPage("总览");
+    }
+    setFlyout(null);
+  };
+
+  if (legacyMode) return <LegacyPreview organization={organizationLabel(organization)} userRole={currentRole.label} onReturn={() => { setLegacyMode(false); selectPage("总览"); window.scrollTo(0, 0); }} />;
 
   return (
     <div className="app-shell">
@@ -381,180 +463,130 @@ export default function Home() {
 
       {mobileOpen && <button className="mobile-scrim" aria-label="关闭导航" onClick={() => setMobileOpen(false)} />}
 
-      <aside className={`sidebar ${mobileOpen ? "is-mobile-open" : ""}`}>
+      <aside id="platform-sidebar" className={`sidebar ${sidebarCollapsed && !mobileOpen ? "is-collapsed" : ""} ${mobileOpen ? "is-mobile-open" : ""}`}
+        onMouseOver={(event) => showNavTooltip(event.target)}
+        onMouseOut={(event) => {
+          const button = (event.target as HTMLElement).closest<HTMLElement>("[data-nav-tooltip]");
+          if (button && event.relatedTarget instanceof Node && button.contains(event.relatedTarget)) return;
+          setNavTooltip(null);
+        }}
+        onFocus={(event) => showNavTooltip(event.target)}
+        onBlur={() => setNavTooltip(null)}
+      >
         <div className="brand-row">
           <div className="brand-logo-image" role="img" aria-label="平台 Logo">
-            <Sparkles size={25} strokeWidth={2.2} aria-hidden="true" />
+            {/* The relative URL also resolves under the GitHub Pages /UI/ base path. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="brand-logo-full" src="wanwu-brand.png" alt="" />
+            <span className="brand-logo-mark" aria-hidden="true">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="wanwu-brand.png" alt="" />
+            </span>
           </div>
           <button className="mobile-close" aria-label="关闭导航" onClick={() => setMobileOpen(false)}><X size={18} /></button>
         </div>
 
-        {orgOpen && <button className="org-menu-dismiss" aria-label="关闭组织切换" onClick={() => setOrgOpen(false)} />}
-        <div className="org-switcher">
-          <button className="org-trigger" aria-expanded={orgOpen} onClick={() => { setOrgOpen((value) => !value); setFlyout(null); setUserMenuOpen(false); }}>
-            <span className="org-trigger-icon"><UsersRound size={16} strokeWidth={2} /></span>
-            <span className="org-name">{organization}</span>
-            {orgOpen ? <ChevronDown className="org-chevron is-open" size={17} /> : <ChevronDown className="org-chevron" size={17} />}
-          </button>
-          {orgOpen && (
-            <div className="org-menu" role="listbox" aria-label="切换组织">
-              {organizations.map((item) => (
-                <button
-                  key={item}
-                  className={organization === item ? "active" : ""}
-                  onClick={() => { setOrganization(item); setOrgOpen(false); }}
-                >
-                  <span className="org-option-icon"><UsersRound size={16} strokeWidth={2} /></span>
-                  <span>{item}</span>
-                  {organization === item && <Check size={15} />}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        <button className="collapse-button" type="button" aria-label={sidebarCollapsed ? "展开导航栏" : "收起导航栏"} aria-expanded={!sidebarCollapsed} aria-controls="platform-sidebar" title={sidebarCollapsed ? "展开导航栏" : "收起导航栏"} onClick={toggleSidebar}>
+          {sidebarCollapsed ? <ChevronRight size={9} strokeWidth={1.5} /> : <ChevronLeft size={9} strokeWidth={1.5} />}
+        </button>
 
-        {activeSecondary === "ontology" ? (
-          <nav ref={businessNavRef} className="business-nav secondary-business-nav" aria-label="本体智能体二级导航">
-            <button className="secondary-business-back" onClick={() => setActiveSecondary(null)}>
-              <ChevronLeft size={17} />
-              <span>本体智能体</span>
+        <div className="sidebar-main">
+        {activePlatform ? (
+          <nav className="business-nav secondary-business-nav" aria-label={`${activePlatform.title}专属导航`}>
+            <button className="secondary-business-back" data-nav-tooltip={`${activePlatform.title} · 返回总览`} onClick={() => selectPage("总览")} aria-label={`${activePlatform.title}，返回总览`} title="返回总览">
+              <ChevronLeft size={17} /><span>{activePlatform.title}</span>
             </button>
             <div className="secondary-nav">
-              {ontologyPrimaryItems.map((item) => {
+              {activePlatform.navigation.map((item, index) => {
                 const ItemIcon = item.icon;
                 return (
-                  <button key={item.label} className={selected === item.label ? "active" : ""} onClick={() => selectSecondaryPage(item.label)}>
-                    <ItemIcon size={17} strokeWidth={1.9} />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-              <div className="secondary-section-label">数据连接</div>
-              {ontologyDataItems.map((item) => {
-                const ItemIcon = item.icon;
-                return (
-                  <button key={item.label} className={selected === item.label ? "active" : ""} onClick={() => selectSecondaryPage(item.label)}>
-                    <ItemIcon size={17} strokeWidth={1.9} />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </nav>
-        ) : activeSecondary === "plaza" ? (
-          <nav ref={businessNavRef} className="business-nav secondary-business-nav" aria-label="资产广场二级导航">
-            <button className="secondary-business-back" onClick={() => setActiveSecondary(null)}>
-              <ChevronLeft size={17} />
-              <span>资产广场</span>
-            </button>
-            <div className="secondary-nav">
-              {assetTypeNavigation.map((item) => {
-                const TypeIcon = item.icon;
-                return (
-                  <button key={item.label} className={assetType === item.label ? "active" : ""} onClick={() => setAssetType(item.label)}>
-                    <TypeIcon size={17} strokeWidth={1.9} />
-                    <span>{item.menuLabel}</span>
-                  </button>
+                  <div key={item.label}>
+                    {activeSecondary === "ontology" && index === 2 && <div className="secondary-section-label">数据连接</div>}
+                    <button className={selected === item.label ? "active" : ""} data-nav-tooltip={`${activePlatform.title} · ${item.label}`} aria-label={item.label} onClick={() => selectSecondaryPage(item.label)}>
+                      <ItemIcon size={17} strokeWidth={1.9} /><span>{item.label}</span>
+                    </button>
+                  </div>
                 );
               })}
             </div>
           </nav>
         ) : (
-        <nav ref={businessNavRef} className="business-nav" aria-label="核心业务导航">
-          {businessNav.filter((group) => !group.items).map((group) => {
-            const Icon = group.icon;
-            return (
-              <Fragment key={group.label}>
-              <button key={group.label} className={`nav-item ${selected === group.label ? "active" : ""}`} onClick={() => selectPage(group.label)}>
-                <Icon className={group.label === "专家" ? "expert-nav-icon" : undefined} size={18} strokeWidth={1.9} />
-                <span className="nav-label">{group.label}</span>
-                {group.badge && <span className="new-badge">{group.badge}</span>}
-                {(group.label === "本体智能体" || group.label === "资产广场") && <ChevronRight className="nav-chevron" size={15} />}
-              </button>
-              </Fragment>
-            );
-          })}
-          {businessNav.filter((group) => group.items).map((group) => (
-            <div className="nav-section" key={group.label}>
-              <div className="nav-section-label">{group.label}</div>
-              <div className="nav-section-items">
-                {group.items!.map((item) => {
+          <nav className="business-nav" aria-label="主平台导航">
+            {primaryNav.map((item) => {
+              const Icon = item.icon;
+              return <button key={item.label} className={`nav-item nav-primary ${selected === item.label ? "active" : ""}`} data-nav-tooltip={item.label} aria-label={item.label} onClick={() => selectPage(item.label)}><Icon size={18} strokeWidth={1.9} /><span className="nav-label">{item.label}</span></button>;
+            })}
+            {businessNav.map((group) => {
+              const items = group.items!;
+              return <div className="nav-section" key={group.label}>
+                <div className="nav-section-label">{group.label}</div>
+                <div className="nav-section-items">{items.map((item) => {
                   const ItemIcon = item.icon;
-                  return (
-                    <button key={item.label} className={`nav-item ${selected === item.label ? "active" : ""}`} onClick={() => selectPage(item.label)}>
-                      <ItemIcon size={18} strokeWidth={1.9} />
-                      <span className="nav-label">{item.label}</span>
-                      {item.badge && <span className="new-badge">{item.badge}</span>}
-                    </button>
-                  );
-                })}
-              </div>
+                  return <button key={item.label} className={`nav-item nav-child ${selected === item.label ? "active" : ""}`} data-nav-tooltip={`${group.label} · ${item.label}`} aria-label={item.label} onClick={() => selectPage(item.label)}><ItemIcon size={17} strokeWidth={1.9} /><span className="nav-label">{item.label}</span></button>;
+                })}</div>
+              </div>;
+            })}
+            <div className="nav-section">
+              <div className="nav-section-label">{capabilityNav.label}</div>
+              <div className="nav-section-items">{capabilityNav.items!.map((item) => { const ItemIcon = item.icon; return <button key={item.label} className={`nav-item nav-child ${selected === item.label ? "active" : ""}`} data-nav-tooltip={`${capabilityNav.label} · ${item.label}`} aria-label={item.label} onClick={() => selectPage(item.label)}><ItemIcon size={17} strokeWidth={1.9} /><span className="nav-label">{item.label}</span></button>; })}</div>
             </div>
-          ))}
-        </nav>
+            <div className="nav-bottom-tools" role="group" aria-label="事件、洞察与高级功能">
+              {standaloneNav.map((item) => {
+                const Icon = item.icon;
+                return <button key={item.label} className={`nav-item nav-primary ${selected === item.label ? "active" : ""}`} data-nav-tooltip={item.label} aria-label={item.label} onClick={() => selectPage(item.label)}><Icon size={18} strokeWidth={1.9} /><span className="nav-label">{item.label}</span></button>;
+              })}
+              {canManageHighCode && highCodeStatus === "active" && <button className={`nav-item nav-primary ${selected === "智能体运行时" ? "active" : ""}`} data-nav-tooltip="智能体运行时" aria-label="智能体运行时" onClick={() => selectPage("智能体运行时")}><Gauge size={18} strokeWidth={1.9} /><span className="nav-label">智能体运行时</span></button>}
+              {advancedNav.map((item) => { const Icon = item.icon; return <button key={item.label} className={`nav-item nav-primary ${selected === item.label ? "active" : ""}`} data-nav-tooltip={item.label} aria-label={item.label} onClick={() => selectPage(item.label)}><Icon size={18} strokeWidth={1.9} /><span className="nav-label">{item.label}</span></button>; })}
+            </div>
+          </nav>
         )}
+        </div>
 
-        <div className={`utility-nav ${hasBoundaryMenu ? "has-boundary-glass" : ""}`}>
-          <button className={`nav-item ${selected === "API Key管理" ? "active" : ""}`} onClick={() => selectPage("API Key管理")}>
-            <KeyRound size={18} strokeWidth={1.9} /><span className="nav-label">API Key管理</span>
-          </button>
-          <button className={`nav-item ${selected === "统计看板" ? "active" : ""}`} onClick={() => selectPage("统计看板")}>
-            <BarChart3 size={18} strokeWidth={1.9} /><span className="nav-label">统计看板</span>
-          </button>
-          {canViewPlatformOperations && (
-            <button
-              className={`nav-item ${isManagementSelected("平台运营") ? "active" : ""}`}
-              onMouseEnter={(event) => showMenuFlyout("平台运营", managementItems.平台运营, event.currentTarget, true)}
-              onMouseLeave={scheduleFlyoutClose}
-              onFocus={(event) => showMenuFlyout("平台运营", managementItems.平台运营, event.currentTarget, true)}
-              onBlur={scheduleFlyoutClose}
-            >
-              <ShieldCheck size={18} strokeWidth={1.9} /><span className="nav-label">平台运营</span><ChevronRight className="nav-chevron" size={15} />
-            </button>
-          )}
-          {canViewManagementCenter && (
-            <button
-              className={`nav-item ${isManagementSelected("管理中心") ? "active" : ""}`}
-              onMouseEnter={(event) => showMenuFlyout("管理中心", visibleManagementItems, event.currentTarget, true)}
-              onMouseLeave={scheduleFlyoutClose}
-              onFocus={(event) => showMenuFlyout("管理中心", visibleManagementItems, event.currentTarget, true)}
-              onBlur={scheduleFlyoutClose}
-            >
-              <Settings2 size={18} strokeWidth={1.9} /><span className="nav-label">管理中心</span><ChevronRight className="nav-chevron" size={15} />
-            </button>
-          )}
+        <div className="sidebar-dock">
+        <div className="utility-nav">
+          <div className={`utility-icon-grid ${!showPlatformOperations && !showManagementCenter ? "only-core" : ""}`}>
+            <button className={`utility-icon utility-api-key ${selected === "API Key 管理" ? "active" : ""}`} data-tooltip="API Key 管理" data-nav-tooltip="API Key 管理" aria-label="API Key 管理" onClick={() => selectPage("API Key 管理")}><KeyRound size={16} strokeWidth={1.9} /><span>API Key</span></button>
+            <button className={`utility-icon utility-usage ${selected === "用量统计" ? "active" : ""}`} data-tooltip="用量统计" data-nav-tooltip="用量统计" aria-label="用量统计" onClick={() => selectPage("用量统计")}><BarChart3 size={16} strokeWidth={1.9} /><span>用量统计</span></button>
+            {showPlatformOperations && <button className={`utility-icon utility-operations ${!showManagementCenter ? "is-single" : ""} ${isManagementSelected("平台运营") ? "active" : ""}`} data-tooltip="平台运营" data-nav-tooltip="平台运营" aria-label="平台运营" aria-haspopup="menu" aria-expanded={flyout?.title === "平台运营"} onClick={(event) => toggleMenuFlyout("平台运营", managementItems.平台运营, event.currentTarget)}><ShieldCheck size={16} strokeWidth={1.9} /><span>平台运营</span></button>}
+            {showManagementCenter && <button className={`utility-icon utility-management ${!showPlatformOperations ? "is-single" : ""} ${isManagementSelected("管理中心") ? "active" : ""}`} data-tooltip="管理中心" data-nav-tooltip="管理中心" aria-label="管理中心" aria-haspopup="menu" aria-expanded={flyout?.title === "管理中心"} onClick={(event) => toggleMenuFlyout("管理中心", visibleManagementItems, event.currentTarget)}><Settings2 size={16} strokeWidth={1.9} /><span>管理中心</span></button>}
+          </div>
         </div>
 
         <div className="sidebar-footer">
-          <div className="avatar">林</div>
-          <div className="profile-copy"><strong>林雨晴</strong><span>{currentRole.label}</span></div>
-          <button
-            className={`icon-button user-more ${userMenuOpen ? "active" : ""}`}
-            aria-label="打开用户菜单"
-            aria-expanded={userMenuOpen}
-            onClick={() => { setUserMenuOpen((value) => !value); setOrgOpen(false); setFlyout(null); }}
-          >
-            <MoreVertical size={18} />
-          </button>
+          <div className="profile-panel">
+            {sidebarCollapsed && !mobileOpen ? <button className="avatar profile-avatar-button" type="button" data-nav-tooltip="账户与组织" aria-label="账户与组织" aria-expanded={userMenuOpen} aria-controls="user-account-menu" onClick={() => { setUserMenuOpen((value) => !value); setOrganizationPickerOpen(false); setFlyout(null); }}>林</button> : <span className="avatar">林</span>}
+            <span className="profile-identity">
+              <span className="profile-heading"><strong className="profile-name">林雨晴</strong><span className="profile-role">{currentRole.label}</span></span>
+              <button className={`profile-organization-switch ${organizationPickerOpen ? "active" : ""}`} aria-label={`切换组织，当前为${organizationLabel(organization)}`} aria-expanded={organizationPickerOpen} aria-controls="organization-popover" title={`切换组织：${organizationLabel(organization)}`} onClick={() => { setOrganizationPickerOpen((value) => !value); setUserMenuOpen(false); setFlyout(null); }}>
+                  <span className="profile-organization-prefix">组织：</span>
+                  <span className="profile-organization">{organizationLabel(organization)}</span>
+                  {/* The supplied SVG is a small local icon shared by both preview builds. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="organization-switch.svg" alt="" width="12" height="12" />
+              </button>
+            </span>
+            <button className={`profile-more ${userMenuOpen ? "active" : ""}`} aria-label="打开用户菜单" aria-expanded={userMenuOpen} aria-controls="user-account-menu" title="用户菜单" onClick={() => { setUserMenuOpen((value) => !value); setOrganizationPickerOpen(false); setFlyout(null); }}><MoreVertical size={17} aria-hidden="true" /></button>
+          </div>
+        </div>
         </div>
 
-        <div className="role-switcher-outside" role="group" aria-label="切换用户角色">
-          {roles.map((item) => (
-            <button
-              key={item.value}
-              className={role === item.value ? "active" : ""}
-              aria-pressed={role === item.value}
-              onClick={() => switchRole(item.value)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
+        {organizationPickerOpen && <>
+          <button className="user-menu-dismiss" aria-label="关闭组织切换" onClick={() => setOrganizationPickerOpen(false)} />
+          <div id="organization-popover" className="organization-popover" role="dialog" aria-label="切换组织">
+            <div className="user-menu-section-label">切换组织</div>
+            <div className="user-organization-list" role="listbox" aria-label="可用组织">
+              {organizations.map((item) => <button key={item} role="option" aria-selected={organization === item} className={organization === item ? "active" : ""} title={organizationLabel(item)} onClick={() => { setOrganization(item); selectPage("总览"); }}>
+                <span>{organizationLabel(item)}</span>{organization === item && <Check size={14} />}
+              </button>)}
+            </div>
+          </div>
+        </>}
 
         {userMenuOpen && (
           <>
-            <button className="user-menu-dismiss" aria-label="关闭用户菜单" onClick={() => setUserMenuOpen(false)} />
-            <div className="user-menu" role="menu" aria-label="用户菜单">
+            <button className="user-menu-dismiss" aria-label="关闭用户菜单" onClick={() => { setUserMenuOpen(false); setOrganizationPickerOpen(false); }} />
+            <div id="user-account-menu" className="user-menu" role="dialog" aria-label="用户菜单">
+              {sidebarCollapsed && !mobileOpen && <div className="collapsed-account-heading"><strong>林雨晴</strong><small>{currentRole.label}</small><button onClick={() => { setOrganizationPickerOpen(true); setUserMenuOpen(false); }}>切换组织 · {organizationLabel(organization)}<ChevronRight size={14} /></button></div>}
               <button onClick={() => selectPage("个人信息")}><UserRound size={17} /><span>个人信息</span></button>
               <button onClick={() => selectPage("画像配置")}><UserRoundCog size={17} /><span>画像配置</span></button>
               <div className="user-menu-divider" />
@@ -562,12 +594,24 @@ export default function Home() {
               <button onClick={() => selectPage("开源仓库")}><GitFork size={17} /><span>开源仓库</span><ExternalLink className="user-menu-end" size={14} /></button>
               <button onClick={() => selectPage("关于")}><Info size={17} /><span>关于</span><small className="user-menu-end">V1.2.0</small></button>
               <div className="user-menu-divider" />
+              <div className="role-preview-label">原型角色预览</div>
+              <div className="role-preview-options" role="group" aria-label="切换用户角色">
+                {roles.map((item) => <button key={item.value} className={role === item.value ? "active" : ""} aria-pressed={role === item.value} onClick={() => switchRole(item.value)}>{item.label}</button>)}
+              </div>
+              <div className="user-menu-divider" />
+              <div className="role-preview-label">固定区入口演示</div>
+              <button className="demo-menu-switch" role="switch" aria-checked={showPlatformOperations} onClick={() => toggleDemoMenu("operations")}><span>平台运营</span><i className={showPlatformOperations ? "on" : ""} aria-hidden="true" /></button>
+              <button className="demo-menu-switch" role="switch" aria-checked={showManagementCenter} onClick={() => toggleDemoMenu("management")}><span>管理中心</span><i className={showManagementCenter ? "on" : ""} aria-hidden="true" /></button>
+              <div className="user-menu-divider" />
               <button className="logout-item" onClick={() => setUserMenuOpen(false)}><LogOut size={17} /><span>登出</span></button>
             </div>
           </>
         )}
       </aside>
 
+      {sidebarCollapsed && navTooltip && !mobileOpen && !userMenuOpen && !organizationPickerOpen && !flyout && <div className="collapsed-nav-tooltip" style={{ top: navTooltip.top }} role="tooltip">{navTooltip.label}</div>}
+
+      {flyout && <button className="flyout-dismiss" aria-label="关闭管理菜单" onClick={() => setFlyout(null)} />}
       {flyout && (
         <div
           className="nav-flyout is-management-hover"
@@ -594,20 +638,20 @@ export default function Home() {
 
       <main className="main-area">
         <section className="content">
-          {selected === "资产广场" ? (
-            <Marketplace
-              key={assetType}
-              assetType={assetType}
-            />
-          ) : (
-            selected === "本体智能体" ? <OntologyAgentPage key={ontologyPageKey} />
-              : selected === "知识网络" ? <KnowledgeNetworkPage />
-                : selected === "数据连接" ? <DataConnectionPage />
-                  : selected === "连接管理" ? <ConnectionManagementPage />
-                    : selected === "扫描管理" ? <ScanManagementPage />
-                      : selected === "数据视图" ? <DataViewPage />
-                        : <PlaceholderPage selected={selected} />
-          )}
+          {selected === "总览" ? <HomeDashboard key={`${organization}:${role}`} role={role} organization={organization} statuses={platformStatuses} onNavigate={selectPage} onOpenPlatform={openPlatform} onEnterPlatform={enterPlatform} highCodeStatus={highCodeStatus} onOpenFeature={openFeature} onReturnLegacy={() => { selectPage("总览"); setLegacyMode(true); window.scrollTo(0, 0); }} />
+            : selected === "资产广场" ? <Marketplace assetType={assetType} onTypeChange={setAssetType} />
+              : featureIntroId ? <FeatureIntroduction key={`${organization}:${featureIntroId}`} id={featureIntroId} organization={organizationLabel(organization)} status={highCodeStatus} application={highCodeApplications[organization]} canActivate={role === "system"} canEnter={canManageHighCode} onBack={() => selectPage("总览")} onRequest={(application) => { setHighCodeApplications(items => ({ ...items, [organization]: application })); updateHighCodeStatus("pending"); }} onActivate={() => updateHighCodeStatus("active")} onEnter={() => featureIntroId === "runtime" ? enterHighCode() : selectPage(featureIntroId === "sdk" ? "软件开发套件" : "低代码 UI")} />
+              : introPlatform ? <PlatformIntroduction key={`${organization}:${introPlatform.id}`} platform={introPlatform} status={platformStatuses[introPlatform.id]} organization={organizationLabel(organization)} application={platformApplications[`${organization}:${introPlatform.id}`]} canActivate={role === "system"} onBack={() => selectPage("总览")} onRequest={(application) => { setPlatformApplications((items) => ({ ...items, [`${organization}:${introPlatform.id}`]: application })); updatePlatformStatus(introPlatform.id, "pending"); }} onActivate={() => activatePlatform(introPlatform.id)} onEnter={() => enterPlatform(introPlatform.id)} />
+                : activePlatform && activeSecondary !== "ontology" ? <IndustrialWorkspace platform={activePlatform} section={selected} />
+                  : selected === "本体智能体" ? <OntologyAgentPage key={ontologyPageKey} />
+                    : selected === "知识网络" ? <KnowledgeNetworkPage />
+                      : selected === "数据连接" ? <DataConnectionPage />
+                        : selected === "连接管理" ? <ConnectionManagementPage />
+                          : selected === "扫描管理" ? <ScanManagementPage />
+                            : selected === "数据视图" ? <DataViewPage />
+                              : selected === "低代码 UI" ? <LowCodeWorkspace />
+                                : mainWorkspaceLabels.has(selected) ? <MainWorkspace key={selected} section={selected} />
+                                : <PlaceholderPage selected={selected} />}
         </section>
       </main>
 
@@ -615,12 +659,12 @@ export default function Home() {
   );
 }
 
-function Marketplace({ assetType }: { assetType: AssetType }) {
+function Marketplace({ assetType, onTypeChange }: { assetType: AssetType; onTypeChange: (type: AssetType) => void }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("全部");
   const categories = assetCategories[assetType];
   const assets = assetCatalog[assetType];
-  const typeIcons: Record<AssetType, LucideIcon> = { 智能体: Bot, 技能: WandSparkles, 插件: Blocks, MCP: RadioTower, 模型: Cpu };
+  const typeIcons: Record<AssetType, LucideIcon> = { 专家: BadgeCheck, 工作流: Workflow, 解决方案: PackageOpen, 工具: Blocks, 模型: Cpu };
   const ActiveTypeIcon = typeIcons[assetType];
   const filtered = assets.filter((agent) =>
     (category === "全部" || agent.tag === category) &&
@@ -629,6 +673,12 @@ function Marketplace({ assetType }: { assetType: AssetType }) {
 
   return (
     <>
+      <div className="asset-type-tabs" aria-label="资产类型">
+        {assetTypeNavigation.map((item) => {
+          const TypeIcon = item.icon;
+          return <button key={item.label} className={assetType === item.label ? "active" : ""} onClick={() => { onTypeChange(item.label); setCategory("全部"); setQuery(""); }}><TypeIcon size={17} />{item.menuLabel}</button>;
+        })}
+      </div>
       <div className="explore-toolbar">
         <div className="category-tabs" aria-label={`${assetType}分类`}>
           {categories.map((item) => <button key={item} className={category === item ? "active" : ""} onClick={() => setCategory(item)}>{item}</button>)}
@@ -677,17 +727,8 @@ function Marketplace({ assetType }: { assetType: AssetType }) {
 
 function PlaceholderPage({ selected }: { selected: string }) {
   const profiles: Record<string, { labels: string[]; values: string[]; panel: string }> = {
-    Unibot: { labels: ["今日会话", "任务完成率", "可用工具", "知识资源"], values: ["186", "97.2%", "28", "1,248"], panel: "Unibot 调用趋势" },
-    本体智能体: { labels: ["智能体总数", "运行中", "任务完成率", "今日执行"], values: ["24", "18", "96.4%", "386"], panel: "任务执行趋势" },
-    智能体开发: { labels: ["智能体项目", "已发布", "调试中", "本周更新"], values: ["32", "21", "7", "12"], panel: "开发活跃度" },
-    资源库: { labels: ["资源总数", "知识资源", "工具资源", "本周新增"], values: ["1,248", "836", "412", "46"], panel: "资源使用趋势" },
-    事件接入: { labels: ["接入源", "今日事件", "处理成功率", "异常事件"], values: ["18", "12,684", "99.2%", "23"], panel: "事件接入趋势" },
-    事件任务: { labels: ["任务总数", "运行中", "执行成功率", "待处理"], values: ["86", "24", "97.8%", "6"], panel: "任务运行趋势" },
-    视觉引擎: { labels: ["模型数量", "运行任务", "识别准确率", "今日检测"], values: ["16", "9", "98.1%", "8,642"], panel: "检测量趋势" },
-    智能体运行时: { labels: ["运行实例", "健康实例", "可用率", "平均延迟"], values: ["68", "65", "99.6%", "126ms"], panel: "实例运行趋势" },
-    镜像仓库: { labels: ["镜像总数", "生产版本", "存储用量", "本周推送"], values: ["126", "34", "286 GB", "18"], panel: "镜像使用趋势" },
-    "API Key管理": { labels: ["全部密钥", "正常使用", "即将过期", "今日调用"], values: ["12", "9", "3", "4,286"], panel: "密钥调用趋势" },
-    统计看板: { labels: ["智能体调用", "Token 消耗", "调用成功率", "本月成本"], values: ["18,642", "2.84M", "98.7%", "¥ 8,426"], panel: "用量趋势" },
+    "API Key 管理": { labels: ["全部密钥", "正常使用", "即将过期", "今日调用"], values: ["12", "9", "3", "4,286"], panel: "密钥调用趋势" },
+    用量统计: { labels: ["专家调用", "Token 消耗", "调用成功率", "本月成本"], values: ["18,642", "2.84M", "98.7%", "¥ 8,426"], panel: "用量趋势" },
   };
   const profile = profiles[selected] ?? { labels: ["全部项目", "运行中", "健康度", "今日处理"], values: ["24", "18", "96.4%", "128"], panel: `${selected}趋势` };
   const metricIcons = [Database, Activity, Gauge, Check];

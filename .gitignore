@@ -42,3 +42,4 @@ yarn-error.log*
 # local prototype preview
 /.preview-server.*
 /dist-pages/
+*.tsbuildinfo

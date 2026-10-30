@@ -1,0 +1,389 @@
+[
+  {
+    "key": "generalAgent",
+    "name": "UniBot",
+    "icon": "legacy-assets/imgs/sidebar/general-agent.svg"
+  },
+  {
+    "key": "experts",
+    "name": "专家",
+    "icon": "legacy-assets/imgs/sidebar/experts.svg",
+    "beta": true
+  },
+  {
+    "key": "ontologyEngine",
+    "name": "本体引擎",
+    "icon": "legacy-assets/imgs/sidebar/ontology-engine.svg",
+    "navigationMode": "DRILL_DOWN",
+    "children": [
+      {
+        "key": "oeOntologyManage",
+        "name": "本体管理",
+        "icon": "legacy-assets/imgs/sidebar/ontology-manage.svg",
+        "children": [
+          {
+            "key": "oeDomain",
+            "name": "域管理",
+            "icon": "legacy-assets/imgs/sidebar/ontology-domain.svg"
+          },
+          {
+            "key": "oeObjectExploration",
+            "name": "对象探索",
+            "icon": "legacy-assets/imgs/sidebar/ontology-object-exploration.svg"
+          },
+          {
+            "key": "oeOverview",
+            "name": "总览",
+            "icon": "legacy-assets/imgs/sidebar/ontology-overview.svg"
+          }
+        ]
+      },
+      {
+        "key": "oeIntelligentModeling",
+        "name": "智能建模",
+        "icon": "legacy-assets/imgs/sidebar/ontology-intelligent-modeling.svg",
+        "children": [
+          {
+            "key": "oeAutoGenerate",
+            "name": "自动生成本体",
+            "icon": "legacy-assets/imgs/sidebar/ontology-auto-generate.svg"
+          },
+          {
+            "key": "oeRecords",
+            "name": "生成记录",
+            "icon": "legacy-assets/imgs/sidebar/ontology-records.svg"
+          }
+        ]
+      },
+      {
+        "key": "oeOntologyBuilding",
+        "name": "本体构建",
+        "icon": "legacy-assets/imgs/sidebar/ontology-building.svg",
+        "children": [
+          {
+            "key": "oeModeling",
+            "name": "本体建模",
+            "icon": "legacy-assets/imgs/sidebar/ontology-modeling.svg"
+          },
+          {
+            "key": "oeRelations",
+            "name": "关系管理",
+            "icon": "legacy-assets/imgs/sidebar/ontology-relations.svg"
+          },
+          {
+            "key": "oeRules",
+            "name": "规则管理",
+            "icon": "legacy-assets/imgs/sidebar/ontology-rules.svg"
+          },
+          {
+            "key": "oeActions",
+            "name": "动作管理",
+            "icon": "legacy-assets/imgs/sidebar/ontology-actions.svg"
+          }
+        ]
+      },
+      {
+        "key": "oeInstanceManage",
+        "name": "实例管理",
+        "icon": "legacy-assets/imgs/sidebar/ontology-instance.svg",
+        "children": [
+          {
+            "key": "oeEntityQuery",
+            "name": "实例查询",
+            "icon": "legacy-assets/imgs/sidebar/ontology-entity-query.svg"
+          },
+          {
+            "key": "oeEntityFinding",
+            "name": "实例数据探查",
+            "icon": "legacy-assets/imgs/sidebar/ontology-entity-finding.svg"
+          }
+        ]
+      },
+      {
+        "key": "oeDataManage",
+        "name": "数据管理",
+        "icon": "legacy-assets/imgs/sidebar/ontology-data.svg",
+        "children": [
+          {
+            "key": "oeDatasource",
+            "name": "数据源管理",
+            "icon": "legacy-assets/imgs/sidebar/ontology-datasource.svg"
+          },
+          {
+            "key": "oeDatasync",
+            "name": "数据同步",
+            "icon": "legacy-assets/imgs/sidebar/ontology-datasync.svg"
+          },
+          {
+            "key": "oeKnowledgeDocs",
+            "name": "知识文档",
+            "icon": "legacy-assets/imgs/sidebar/ontology-knowledge-docs.svg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "square",
+    "name": "资产广场",
+    "icon": "legacy-assets/imgs/sidebar/square.svg",
+    "navigationMode": "DRILL_DOWN",
+    "children": [
+      {
+        "key": "explore",
+        "name": "智能体",
+        "icon": "legacy-assets/imgs/sidebar/explore.svg"
+      },
+      {
+        "key": "bankOfSkill",
+        "name": "技能",
+        "icon": "legacy-assets/imgs/sidebar/bank-of-skill.svg"
+      },
+      {
+        "key": "modelBank",
+        "name": "模型",
+        "icon": "legacy-assets/imgs/sidebar/model-bank.svg"
+      },
+      {
+        "key": "pluginSquare",
+        "name": "插件",
+        "icon": "legacy-assets/imgs/sidebar/plugin-square.svg"
+      },
+      {
+        "key": "mcpSquare",
+        "name": "MCP",
+        "icon": "legacy-assets/imgs/sidebar/mcp-square.svg"
+      }
+    ]
+  },
+  {
+    "key": "development_center",
+    "name": "开发中心",
+    "icon": "legacy-assets/imgs/development_center.svg",
+    "children": [
+      {
+        "key": "appManage",
+        "name": "智能体开发",
+        "icon": "legacy-assets/imgs/sidebar/app-manage.svg"
+      },
+      {
+        "key": "low_code",
+        "name": "低代码",
+        "icon": "legacy-assets/imgs/sidebar/low-code.svg",
+        "navigationMode": "DRILL_DOWN",
+        "children": [
+          {
+            "key": "lowCodeApps",
+            "name": "应用管理",
+            "icon": "legacy-assets/imgs/sidebar/low-code-apps.svg"
+          },
+          {
+            "key": "lowCodeTemplates",
+            "name": "模板管理",
+            "icon": "legacy-assets/imgs/sidebar/low-code-templates.svg"
+          },
+          {
+            "key": "lowCodeMaterials",
+            "name": "组件包管理",
+            "icon": "legacy-assets/imgs/sidebar/low-code-materials.svg"
+          },
+          {
+            "key": "lowCodeWorkflows",
+            "name": "工作流管理",
+            "icon": "legacy-assets/imgs/sidebar/low-code-workflows.svg"
+          },
+          {
+            "key": "lowCodeStats",
+            "name": "统计看板",
+            "icon": "legacy-assets/imgs/sidebar/low-code-stats.svg"
+          },
+          {
+            "key": "lowCodeOperations",
+            "name": "运营看板",
+            "icon": "legacy-assets/imgs/sidebar/low-code-operations.svg"
+          }
+        ]
+      },
+      {
+        "key": "resourceLibrary",
+        "name": "资源库",
+        "icon": "legacy-assets/imgs/sidebar/resource-library.svg"
+      }
+    ]
+  },
+  {
+    "key": "event_center",
+    "name": "事件中心",
+    "icon": "legacy-assets/imgs/event_center.svg",
+    "children": [
+      {
+        "key": "eventManage",
+        "name": "事件接入",
+        "icon": "legacy-assets/imgs/sidebar/event-manage.svg"
+      },
+      {
+        "key": "eventTask",
+        "name": "事件任务",
+        "icon": "legacy-assets/imgs/sidebar/event-task.svg"
+      },
+      {
+        "key": "eventCenter",
+        "name": "事件中心",
+        "icon": "legacy-assets/imgs/sidebar/event-manage.svg"
+      }
+    ]
+  },
+  {
+    "key": "runtime",
+    "name": "部署运行",
+    "icon": "legacy-assets/imgs/deploy.svg",
+    "children": [
+      {
+        "key": "agentRuntime",
+        "name": "智能体运行时",
+        "icon": "legacy-assets/imgs/sidebar/agent-runtime.svg"
+      },
+      {
+        "key": "agentRuntimePlaceholder",
+        "name": "智能体运行时",
+        "icon": "legacy-assets/imgs/sidebar/agent-runtime.svg"
+      },
+      {
+        "key": "imageRepository",
+        "name": "镜像仓库",
+        "icon": "legacy-assets/imgs/sidebar/image-repository.svg"
+      },
+      {
+        "key": "imageRepositoryPlaceholder",
+        "name": "镜像仓库",
+        "icon": "legacy-assets/imgs/sidebar/image-repository.svg"
+      },
+      {
+        "key": "observability_overview",
+        "name": "运行观测",
+        "icon": "legacy-assets/imgs/sidebar/operation-dashboard.svg"
+      },
+      {
+        "key": "agent_insights_center",
+        "name": "智能体洞察",
+        "icon": "legacy-assets/imgs/sidebar/statistic.svg",
+        "navigationMode": "DRILL_DOWN",
+        "children": [
+          {
+            "key": "agent_insights",
+            "name": "智能体观测",
+            "icon": "legacy-assets/imgs/sidebar/statistic.svg"
+          },
+          {
+            "key": "agent_insights_evaluation",
+            "name": "智能体评测",
+            "icon": "legacy-assets/imgs/sidebar/statistic.svg"
+          },
+          {
+            "key": "agent_insights_optimization",
+            "name": "智能体评优",
+            "icon": "legacy-assets/imgs/sidebar/statistic.svg"
+          }
+        ]
+      },
+      {
+        "key": "auditLog",
+        "name": "审计日志",
+        "icon": "legacy-assets/imgs/auditLog.svg"
+      },
+      {
+        "key": "softwareDev",
+        "name": "软件开发套件",
+        "icon": "legacy-assets/imgs/software-dev.svg"
+      },
+      {
+        "key": "resourceControl",
+        "name": "资源管控",
+        "icon": "legacy-assets/imgs/ops_maintenance.svg"
+      }
+    ]
+  },
+  {
+    "key": "engine_center",
+    "name": "工业引擎",
+    "icon": "legacy-assets/imgs/industrial-engine.svg",
+    "children": [
+      {
+        "key": "visualPerception",
+        "name": "视觉感知引擎",
+        "icon": "legacy-assets/imgs/sidebar/visual-perception.svg"
+      },
+      {
+        "key": "visualPerceptionExternal",
+        "name": "视觉感知引擎",
+        "icon": "legacy-assets/imgs/sidebar/visual-perception.svg"
+      },
+      {
+        "key": "etEngine",
+        "name": "ET引擎",
+        "icon": "legacy-assets/imgs/sidebar/et-engine.svg"
+      }
+    ]
+  },
+  {
+    "key": "openApiKey",
+    "name": "API Key 管理",
+    "icon": "legacy-assets/imgs/sidebar/open-api-key.svg",
+    "footer": true
+  },
+  {
+    "key": "statistic",
+    "name": "统计看板",
+    "icon": "legacy-assets/imgs/sidebar/statistic.svg",
+    "footer": true
+  },
+  {
+    "key": "workbench_center",
+    "name": "平台运营",
+    "icon": "legacy-assets/imgs/sidebar/workbench-center.svg",
+    "footer": true,
+    "systemOnly": true,
+    "children": [
+      {
+        "key": "auditWorkbench",
+        "name": "审核工作台",
+        "icon": "legacy-assets/imgs/sidebar/audit-workbench.svg"
+      },
+      {
+        "key": "plazaGovernance",
+        "name": "广场治理",
+        "icon": "legacy-assets/imgs/sidebar/plaza-governance.svg"
+      },
+      {
+        "key": "operationDashboard",
+        "name": "运营看板",
+        "icon": "legacy-assets/imgs/sidebar/operation-dashboard.svg"
+      }
+    ]
+  },
+  {
+    "key": "system_center",
+    "name": "管理中心",
+    "icon": "legacy-assets/imgs/sidebar/system-center.svg",
+    "footer": true,
+    "children": [
+      {
+        "key": "orgManage",
+        "name": "人员管理",
+        "icon": "legacy-assets/imgs/sidebar/org-manage.svg"
+      },
+      {
+        "key": "platManage",
+        "name": "平台配置",
+        "icon": "legacy-assets/imgs/sidebar/plat-manage.svg",
+        "systemOnly": true
+      },
+      {
+        "key": "oauthManage",
+        "name": "OAuth密钥管理",
+        "icon": "legacy-assets/imgs/sidebar/oauth-manage.svg",
+        "systemOnly": true
+      }
+    ]
+  }
+]

@@ -1,0 +1,56 @@
+.afi-page { max-width: 1440px; margin: 0 auto; padding-bottom: 12px; }
+.main-area:has(.afi-page) { background: #fcfcfd; }
+.afi-page .home-button:disabled { opacity: .6; cursor: default; transform: none; }
+.afi-hero { display: grid; grid-template-columns: 1.1fr 1fr; gap: 38px; align-items: center; padding: 20px 0 30px; }
+.afi-label { color: #074ce0; font-size: 11px; font-weight: 600; }
+.afi-hero h2 { margin: 15px 0; max-width: 500px; font-size: clamp(26px, 2.8vw, 36px); line-height: 1.4; letter-spacing: -.04em; }
+.afi-hero > div > p { max-width: 500px; margin: 0; color: #454c58; font-size: 13px; line-height: 1.85; }
+.afi-audience { display: flex; flex-direction: column; gap: 6px; margin-top: 22px; padding-left: 12px; border-left: 2px solid #074ce0; font-size: 11px; }.afi-audience span { color: #606a78; }.afi-access-note { margin-top: 17px; color: #606a78; font-size: 11px; line-height: 1.7; }
+.afi-preview { border: 1px solid #dde0e6; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 12px 30px #16191f08; min-width: 0; }
+.afi-preview-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; background: #f3f4f6; border-bottom: 1px solid #dde0e6; color: #454c58; font-size: 11px; }.afi-preview-head small { color: #606a78; font-size: 10px; }
+.afi-instances { padding: 0 15px; }.afi-instances > div { display: flex; align-items: center; gap: 10px; padding: 16px 0; border-bottom: 1px solid #edf0f5; }.afi-instances > div > svg { color: #074ce0; flex-shrink: 0; }.afi-instances > div > span { display: flex; flex-direction: column; gap: 5px; }.afi-instances strong { font-size: 12px; }.afi-instances small { color: #606a78; font-size: 10px; }.afi-instances em { margin-left: auto; padding: 4px 7px; border-radius: 4px; color: #074ce0; background: #edf3ff; font-size: 9px; font-style: normal; white-space: nowrap; }
+.afi-terminal { margin: 13px 15px; padding: 12px; border-radius: 7px; background: #16191f; color: #d0d4dd; font-size: 10px; }.afi-terminal > span { color: #a9bfff; }.afi-terminal code { display: block; margin-top: 9px; line-height: 1.9; }
+.afi-preview-note { padding: 9px 15px 11px; color: #606a78; font-size: 9px; border-top: 1px solid #edf0f5; }
+.afi-language { display: flex; padding: 10px 14px; gap: 5px; }.afi-language button { padding: 5px 9px; border: 0; border-radius: 5px; background: #f3f4f6; font-size: 10px; color: #454c58; }.afi-language button[aria-pressed="true"] { color: white; background: #074ce0; }
+.afi-code { margin: 0 14px; padding: 16px; border-radius: 7px; color: #d8e5ff; background: #16191f; font-size: 11px; line-height: 1.9; overflow-x: auto; }.afi-code-note { padding: 12px 15px; color: #606a78; font-size: 10px; }
+.afi-ui-form { padding: 16px; }.afi-ui-form label { display: flex; flex-direction: column; gap: 7px; color: #454c58; font-size: 11px; }.afi-ui-form input { width: 100%; padding: 9px; border: 1px solid #dde0e6; border-radius: 6px; background: #f8f9fb; color: #454c58; font-size: 12px; }.afi-ui-form > span { display: block; margin: 16px 0 9px; color: #606a78; font-size: 10px; }.afi-binding-options { display: flex; flex-wrap: wrap; gap: 6px; }.afi-binding-options button { display: flex; align-items: center; gap: 5px; padding: 7px; border: 1px solid #dde0e6; border-radius: 5px; background: white; color: #454c58; font-size: 10px; }.afi-binding-options button[aria-pressed="true"] { color: #074ce0; border-color: #9ebafa; background: #edf3ff; }.afi-run-example { margin-top: 19px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border: 0; border-radius: 5px; background: #074ce0; color: white; font-size: 11px; }.afi-run-example:disabled { opacity: .5; cursor: default; }.afi-ui-form > p { min-height: 28px; font-size: 10px; color: #606a78; line-height: 1.6; margin: 10px 0 0; }
+.afi-capabilities { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; padding: 24px 0 28px; border-top: 1px solid #dde0e6; }.afi-capabilities article > svg { color: #074ce0; }.afi-capabilities h3 { margin: 12px 0 7px; font-size: 15px; }.afi-capabilities p { margin: 0; color: #454c58; font-size: 12px; line-height: 1.8; }
+.afi-start { padding: 24px; border-radius: 12px; background: #f3f4f6; }.afi-section-head > span { font-size: 10px; color: #606a78; }.afi-section-head h2 { margin: 6px 0 22px; font-size: 21px; }.afi-start ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; list-style: none; padding: 0; margin: 0; }.afi-start li { display: flex; align-items: flex-start; gap: 10px; }.afi-start li > span { flex-shrink: 0; width: 24px; height: 24px; display: grid; place-items: center; border: 1px solid #d7deea; border-radius: 6px; color: #074ce0; background: white; font-size: 11px; }.afi-start h3 { font-size: 12px; margin: 4px 0 8px; }.afi-start p { margin: 0; font-size: 11px; color: #454c58; line-height: 1.8; }.afi-start li > svg { flex-shrink: 0; color: #7f92b1; margin-top: 5px; }
+.afi-bottom-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 28px; padding: 28px 0; }.afi-scenario h2 { margin: 10px 0; font-size: 20px; }.afi-scenario p { margin: 0; color: #454c58; font-size: 12px; line-height: 1.9; }.afi-boundary { padding: 18px 20px; border: 1px solid #dde0e6; border-radius: 10px; background: white; }.afi-boundary h3 { margin: 0 0 9px; font-size: 13px; }.afi-boundary p { margin: 0; font-size: 12px; line-height: 1.8; color: #454c58; }.afi-boundary small { display: block; margin-top: 13px; padding-top: 12px; border-top: 1px solid #edf0f5; font-size: 10px; color: #606a78; line-height: 1.7; }
+@media (max-width: 1000px) { .afi-hero { gap: 24px; }.afi-hero h2 { font-size: 27px; }.afi-start ol { gap: 15px; }.afi-start li > svg { display: none; } }
+@media (max-width: 760px) { .afi-hero { grid-template-columns: 1fr; }.afi-capabilities { grid-template-columns: 1fr; gap: 19px; }.afi-start ol { grid-template-columns: 1fr; gap: 18px; }.afi-bottom-grid { grid-template-columns: 1fr; gap: 20px; } }
+/* Advanced features use the same visual hierarchy as industrial engines. */
+.afi-page .afi-hero { grid-template-columns:1.2fr 1fr; gap:40px; padding:32px; background:#f3f4f6; border:1px solid #dde0e6; border-radius:12px; }
+.afi-page .afi-label { font-size:12px; }
+.afi-page .afi-hero h2 { max-width:600px; font-size:clamp(26px,2.5vw,38px); line-height:1.3; letter-spacing:-.04em; margin:18px 0; }
+.afi-page .afi-hero > div > p { max-width:580px; font-size:14px; line-height:1.85; }
+.afi-page .afi-audience { margin-top:24px; padding-left:14px; font-size:12px; gap:8px; }
+.afi-page .afi-access-note { font-size:11px; }
+.afi-page .afi-preview { border-color:#d1d6df; box-shadow:0 8px 24px #16191f0a; }
+.afi-page .afi-preview-head { padding:14px 18px; background:white; font-size:12px; }
+.afi-page .afi-preview-note { background:#fcfcfd; padding:10px 18px; font-size:10px; }
+.afi-page .afi-instances { padding:0 18px; }
+.afi-page .afi-instances strong { font-size:13px; }
+.afi-page .afi-terminal,.afi-page .afi-code { background:#303640; color:#f3f4f6; }
+.afi-page .afi-code { font-size:12px; padding:20px; }
+.afi-page .afi-capabilities { gap:18px; border:0; padding:28px 0; }
+.afi-page .afi-capabilities article { padding:24px; background:#303640; border:1px solid #48515e; border-radius:12px; }
+.afi-page .afi-capabilities article > svg { color:#f3f4f6; width:26px; height:26px; }
+.afi-page .afi-capabilities h3 { color:#fcfcfd; margin:16px 0 10px; font-size:16px; }
+.afi-page .afi-capabilities p { color:#e0e3e9; font-size:13px; }
+.afi-page .afi-start { border:1px solid #dde0e6; padding:28px; }
+.afi-page .afi-section-head > span { color:#074ce0; font-size:12px; }
+.afi-page .afi-section-head h2 { font-size:22px; margin:8px 0 24px; }
+.afi-page .afi-start ol { gap:20px; }
+.afi-page .afi-start li { padding:18px; border:1px solid #dde0e6; border-radius:8px; background:white; }
+.afi-page .afi-start h3 { font-size:14px; margin:3px 0 8px; }
+.afi-page .afi-start p { font-size:12px; }
+.afi-page .afi-bottom-grid { gap:28px; padding:28px 0 0; }
+.afi-page .afi-scenario { padding:24px; border:1px solid #dde0e6; border-radius:12px; background:white; }
+.afi-page .afi-scenario h2 { font-size:22px; margin:12px 0; }
+.afi-page .afi-scenario p { font-size:13px; }
+.afi-page .afi-boundary { padding:24px; border-radius:12px; background:#f3f4f6; }
+.afi-page .afi-boundary h3 { font-size:15px; }
+.afi-page :is(button,input):focus-visible { outline:2px solid #074ce0; outline-offset:3px; }
+@media(max-width:1000px) { .afi-page .afi-hero { padding:24px; gap:24px; }.afi-page .afi-start li { padding:14px; } }
+@media(max-width:760px) { .afi-page .afi-hero { grid-template-columns:1fr; padding:20px; }.afi-page .afi-capabilities { grid-template-columns:1fr; gap:12px; }.afi-page .afi-capabilities article { padding:20px; }.afi-page .afi-start { padding:20px; }.afi-page .afi-start ol { grid-template-columns:1fr; }.afi-page .afi-bottom-grid { grid-template-columns:1fr; gap:18px; } }
